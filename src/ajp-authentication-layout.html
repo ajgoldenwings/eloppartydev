@@ -1,0 +1,80 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="ajp-button.html">
+<link rel="import" href="ajp-common-styles.html">
+<link rel="import" href="ajp-toolbar.html">
+
+<dom-module id="ajp-authentication-layout">
+
+	<template>
+
+		<style include="ajp-button ajp-common-styles">
+
+			:host {
+				display: block;
+				padding-top: 64px;
+				/*height: calc(100vh - 64px);*/
+			}
+
+			iron-pages {
+				/*min-height: 100vh;
+				max-width: 1440px;
+				margin: 0 auto;*/
+
+        margin: 0 auto;
+        padding: 0 24px 48px 24px;
+        max-width: 900px;
+        overflow: hidden;
+			}
+
+			/* small screen */
+			@media (max-width: 767px) {
+				:host {
+
+				}
+			}
+
+		</style>
+
+		<iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
+
+		<ajp-toolbar></ajp-toolbar>
+
+		<app-location route="{{route}}"></app-location>
+		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+
+			<ajp-signon name="signon"></ajp-signon>
+
+			<ajp-signup name="signup"></ajp-signup>
+
+		</iron-pages>
+
+
+    <footer>
+			<ajp-button>
+				<a href="/welcome">Go Back</a>
+			</ajp-button>
+    </footer>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-authentication-layout',
+
+			properties: {
+				page: {
+					type: String
+				}
+			}
+
+		});
+
+	</script>
+
+</dom-module>

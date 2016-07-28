@@ -1,0 +1,201 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="ajp-authentication-styles.html">
+<link rel="import" href="ajp-button.html">
+<link rel="import" href="ajp-input.html">
+
+<dom-module id="ajp-signup">
+
+	<template>
+
+		<style include="ajp-button ajp-input ajp-authentication-styles">
+
+		</style>
+
+		<form
+			id="signonForm"
+			is="iron-form"
+			method="post"
+			action="/data/sample_success_response.json"
+			on-iron-form-response="_didReceiveResponse"
+			on-iron-form-presubmit="_willSendRequest"
+		>
+
+			<h2>Sign Up</h2>
+
+			<div class="subsection grid" visible$="[[_hasItems]]">
+				<section>
+
+					<div class="row input-row">
+						<ajp-input>
+							<input type="username" id="accountUsername" name="accountUsername"
+									placeholder="Username" autofocus required
+									aria-labelledby="accountUsernameLabel">
+							<ajp-md-decorator error-message="Invalid Username" aria-hidden="true">
+								<label id="accountUsernameLabel">Username</label>
+								<ajp-underline></ajp-underline>
+							</ajp-md-decorator>
+						</ajp-input>
+					</div>
+
+					<div class="row input-row">
+						<ajp-input>
+							<input type="password" id="accountPassword" name="accountPassword"
+									placeholder="Password" required
+									aria-labelledby="accountPasswordLabel">
+							<ajp-md-decorator error-message="Invalid Password" aria-hidden="true">
+								<label id="accountPasswordLabel">Password</label>
+								<ajp-underline></ajp-underline>
+							</ajp-md-decorator>
+						</ajp-input>
+					</div>
+
+					<div class="row input-row">
+						<ajp-input>
+							<input type="password" id="accountPasswordConfirm" name="accountPasswordConfirm"
+									placeholder="Confirm Password" required
+									aria-labelledby="accountPasswordConfirmLabel">
+							<ajp-md-decorator error-message="Invalid Confirmed Password" aria-hidden="true">
+								<label id="accountPasswordConfirmLabel">Confirm Password</label>
+								<ajp-underline></ajp-underline>
+							</ajp-md-decorator>
+						</ajp-input>
+					</div>
+
+					<div class="row input-row">
+						<ajp-button responsive responsive-1 on-click="_signUp">
+							<a>Sign Up</a>
+						</ajp-button>
+					</div>
+
+				</section>
+				<section responsive-hidden>
+
+					<div class="row input-row">
+						<paper-card heading="Already have a accout?" class="white" elevation="2">
+							<div class="card-content">Go sign on to your account here.</div>
+							<div class="card-actions">
+								<ajp-button responsive>
+									<a href="/signon"><div responsive-show hidden>&#8630; </div>Sign On</a>
+								</ajp-button>
+							</div>
+						</paper-card>
+					</div>
+
+				</section>
+			</div>
+
+		</form>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-signup',
+
+			properties: {
+
+			},
+
+      _didReceiveResponse: function(e) {
+
+				console.log("_didReceiveResponse");
+        // var response = e.detail.response;
+
+        // this.response = response;
+        // this._setWaiting(true);
+
+        // if (response.success) {
+        //   this._pushState('success');
+        //   this._reset();
+        //   this.fire('clear-cart');
+        // } else {
+        //   this._pushState('error');
+        // }
+      },
+
+      _signUp: function() {
+				if (this._validateForm()) {
+					this.fire('fireSignUp', {action: 'signUp', name: this.$.accountUsername.value, password: this.$.accountPassword.value});
+				}
+      },
+
+      _validateForm: function() {
+        var form = this.$.signonForm, firstInvalid = false;
+
+        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+          if (el.checkValidity()) {
+            el.removeAttribute('aria-invalid');
+          } else {
+            if (!firstInvalid) {
+              // announce error message
+              if (el.nextElementSibling) {
+                this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+              }
+              if (el.scrollIntoViewIfNeeded) {
+                // safari, chrome
+                el.scrollIntoViewIfNeeded();
+              } else {
+                // firefox, edge, ie
+                el.scrollIntoView(false);
+              }
+              el.focus();
+              firstInvalid = true;
+            }
+            el.setAttribute('aria-invalid', 'true');
+          }
+        }
+
+				if (firstInvalid) {
+					this.fire('fireShowSnack', {action: 'showSnack', message: 'Sign up has failed. Please fill out and try again.'});
+				}
+
+				if (!firstInvalid) {
+					firstInvalid = !this._passMatch(this.$.accountPassword,this.$.accountPasswordConfirm);
+					if (firstInvalid) {
+						this.fire('fireShowSnack', {action: 'showSnack', message: 'Passwords do not match.'});
+					}
+				}
+
+        return !firstInvalid;
+      },
+
+			_passMatch: function(password,passwordConfirm) {
+				if(password.value != passwordConfirm.value){
+					password.value = '';
+					passwordConfirm.value = '';
+					return false;
+				} else {
+					return true;
+				}
+			},
+
+      _willSendRequest: function(e) {
+
+				console.log("_willSendRequest");
+        // var form = e.target;
+        // var body = form.request.body;
+
+        // this._setWaiting(true);
+
+        // if (!body) {
+        //   return;
+        // }
+        // // Populate the request body where `cartItemsId[i]` is the ID and `cartItemsQuantity[i]`
+        // // is the quantity for some item `i`.
+        // body.cartItemsId = [];
+        // body.cartItemsQuantity = [];
+
+        // this.cart.forEach(function(cartItem) {
+        //   body.cartItemsId.push(cartItem.item.name);
+        //   body.cartItemsQuantity.push(cartItem.quantity);
+        // });
+      }
+
+		});
+
+	</script>
+
+</dom-module>

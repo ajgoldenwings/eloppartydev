@@ -1,0 +1,10 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/ajp-app.html",
+  "fragments": [
+    "src/ajp-header.html",
+    "src/ajp-list.html",
+    "src/ajp-detail.html",
+    "src/lazy-resources.html"
+  ]
+}

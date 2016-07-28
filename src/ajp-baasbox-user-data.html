@@ -1,0 +1,52 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+
+<dom-module id="ajp-baasbox-user-data">
+
+	<template>
+    <iron-localstorage
+        name="ajp-baasbox-user-data"
+        value="{{user}}"
+        on-iron-localstorage-load-empty="_initializeUser"></iron-localstorage>
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-baasbox-user-data',
+
+			properties: {
+
+				user: {
+          type: Object,
+          value: function() {
+            return {'name':{}};
+          }
+        }
+
+			},
+
+      setName: function() {
+
+      },
+
+      getName: function() {
+
+      },
+
+      clearUser: function() {
+        this.user = {'name':{}};
+				console.log(this.user)
+      },
+
+      _initializeUser: function() {
+				console.log('_initializeUser')
+        this.clearUser();
+      }
+
+		});
+
+	</script>
+
+</dom-module>

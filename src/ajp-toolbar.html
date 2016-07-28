@@ -1,0 +1,74 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="ajp-common-styles.html">
+
+<dom-module id="ajp-toolbar">
+
+	<template>
+
+		<style include="ajp-common-styles">
+
+			app-header {
+				@apply(--layout-fixed-top);
+				z-index: 1;
+				background-color: rgba(255, 255, 255, 0.95);
+				--app-header-shadow: {
+					box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.2);
+					height: 10px;
+					bottom: -10px;
+				};
+			}
+
+			/*.left-bar-item {
+				width: 40px;
+			}*/
+
+			.logo {
+				text-align: center;
+			}
+
+			.logo a {
+				font-size: 25px;
+				font-weight: 600;
+				letter-spacing: 0.2em;
+				color: var(--app-primary-color);
+				text-decoration: none;
+				/* required for IE 11, so this <a> can receive pointer events */
+				display: inline-block;
+				pointer-events: auto;
+			}
+
+			:host(:not([page=detail])) .back-btn {
+				display: none;
+			}
+
+		</style>
+
+		<app-header role="navigation" id="header" effects="waterfall" condenses reveals>
+			<app-toolbar>
+				<!--<div class="left-bar-item">
+					<a class="back-btn" href="/list/[[categoryName]]" tabindex="-1">
+						<paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
+					</a>
+				</div>-->
+				<div class="logo" title><a href="/" aria-label="Elop Party">Elop Party</a></div>
+			</app-toolbar>
+		</app-header>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-toolbar',
+
+			properties: {
+
+			}
+
+		});
+
+	</script>
+
+</dom-module>

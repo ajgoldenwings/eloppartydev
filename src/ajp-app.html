@@ -1,0 +1,306 @@
+<!-- @license Copyright (c) 2016 The Polymer Project Authors. All rights reserved. This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt Code distributed by Google as part of the polymer project is also subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<!-- Since 'welcome' is the default route, eagerly load it. -->
+<link rel="import" href="ajp-welcome.html">
+<link rel="import" href="ajp-app-layout.html">
+<link rel="import" href="ajp-authentication-layout.html">
+<link rel="import" href="ajp-baasbox.html">
+<link rel="import" href="ajp-toolbar.html">
+
+<dom-module id="ajp-app">
+
+	<template>
+
+		<style>
+
+			:host {
+				display: block;
+				position: relative;
+				min-height: 100vh;
+				--app-primary-color: #202020;
+				--app-secondary-color: #757575;
+				--app-accent-color: #172C50;
+				--paper-button-ink-color: var(--app-accent-color);
+				--paper-icon-button-ink-color: var(--app-accent-color);
+				--paper-spinner-color: var(--app-accent-color);
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+				color: var(--app-primary-color);
+			}
+
+			paper-icon-button {
+				color: var(--app-primary-color);
+			}
+
+			.announcer {
+				position: fixed;
+				height: 0;
+				overflow: hidden;
+			}
+
+			[hidden] {
+				display: none !important;
+			}
+
+			#tabContainer {
+				position: relative;
+				height: 66px;
+			}
+
+			ajp-tabs, ajp-tab {
+				--ajp-tab-overlay: {
+					border-bottom: 2px solid var(--app-accent-color);
+				};
+			}
+
+			ajp-tabs {
+				height: 100%;
+			}
+
+			ajp-tab {
+				margin: 0 10px;
+			}
+
+			ajp-tab a {
+				display: inline-block;
+				outline: none;
+				padding: 9px 5px;
+				font-size: 16px;
+				font-weight: 500;
+				text-decoration: none;
+				color: var(--app-primary-color);
+			}
+
+			ajp-welcome-layout {
+				display: block;
+				min-height: 100vh;
+			}
+
+			iron-pages {
+				min-height: 100vh;
+				margin: 0 auto;
+			}
+
+		</style>
+
+		<app-location route="{{route}}"></app-location>
+		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+		<ajp-baasbox id="baasbox"></ajp-baasbox>
+
+		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
+
+			<ajp-app-layout name="main" page="[[page]]"></ajp-app-layout>
+
+			<ajp-authentication-layout name="authentication" page="[[page]]"></ajp-authentication-layout>
+
+			<ajp-welcome-layout id="welcome" name="welcome"></ajp-welcome-layout>
+
+		</iron-pages>
+
+		<!-- a11y announcer -->
+		<div class="announcer" aria-live="assertive">[[_a11yLabel]]</div>
+
+	</template>
+
+	<script>
+
+		// performance logging
+		window.performance && performance.mark && performance.mark('ajp-app - before register');
+
+		Polymer({
+
+			is: 'ajp-app',
+
+			properties: {
+				page: {
+					type: String,
+					reflectToAttribute: true,
+					observer: '_pageChanged'
+				},
+
+				getLayout: {
+					type: String
+				}
+			},
+
+			observers: [
+				'_routePageChanged(routeData.page)'
+			],
+
+			listeners: {
+				'change-section': '_onChangeSection',
+				'announce': '_onAnnounce',
+				'dom-change': '_domChange'
+			},
+
+			created: function() {
+				window.performance && performance.mark && performance.mark('ajp-app.created');
+				// Custom elements polyfill safe way to indicate an element has been upgraded.
+				this.removeAttribute('unresolved');
+			},
+
+			ready: function() {
+				// listen for online/offline
+				Polymer.RenderStatus.afterNextRender(this, function() {
+					this.listen(window, 'online', '_notifyNetworkStatus');
+					this.listen(window, 'offline', '_notifyNetworkStatus');
+				});
+
+				this.addEventListener('fireSignUp', this._fireAction);
+				this.addEventListener('fireShowSnack', this._fireAction);
+			},
+
+			_fireAction: function(event) {
+				switch(event.detail.action) {
+					case 'signUp':
+						this.$.baasbox.signUp(event.detail.name, event.detail.password);
+						break
+					case 'showSnack':
+						this._throwSnack(event.detail.message);
+						break
+					default:
+						console.log('There was no matching details for the event.', event);
+				}
+			},
+
+			_getLayoutValue: function(page) {
+				var value;
+				switch(page) {
+					case 'welcome':
+						value = 'welcome';
+     				this.$.welcome.resetSelectedValue();
+						break;
+					case 'signon':
+						value = 'authentication';
+						break;
+					case 'signup':
+     				// this.$.baasbox.signUp();
+						value = 'authentication';
+						break;
+					default:
+						value = 'main';
+				}
+				this.getLayout = value;
+			},
+
+			_getIronPageValue: function(page) {
+				this.page = page || 'welcome';
+			},
+
+			_routePageChanged: function(page) {
+				this._getIronPageValue(page);
+				this._getLayoutValue(this.page);
+				// Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
+				// with `behavior: 'silent'` to disable header scroll effects during the scroll.
+				Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+				// Close the drawer - in case the *route* change came from a link in the drawer.
+				this.drawerOpened = false;
+			},
+
+			_pageChanged: function(page, oldPage) {
+				if (page != null) {
+					// home route is eagerly loaded
+					if (page == 'home') {
+						this._pageLoaded(Boolean(oldPage));
+					// other routes are lazy loaded
+					} else {
+						this.importHref(
+							this.resolveUrl('ajp-' + page + '.html'),
+							function() {
+								this._pageLoaded(Boolean(oldPage));
+							}, null, true);
+					}
+				}
+			},
+
+			_pageLoaded: function(shouldResetLayout) {
+				this._ensureLazyLoaded();
+			},
+
+			_ensureLazyLoaded: function() {
+				// load lazy resources after render and set `loadComplete` when done.
+				if (!this.loadComplete) {
+					Polymer.RenderStatus.afterNextRender(this, function() {
+						this.importHref(this.resolveUrl('lazy-resources.html'), function() {
+							// Register service worker if supported.
+							if ('serviceWorker' in navigator) {
+								navigator.serviceWorker.register('/service-worker.js');
+							}
+							this._notifyNetworkStatus();
+							this.loadComplete = true;
+						});
+					});
+				}
+			},
+
+			_notifyNetworkStatus: function() {
+				var oldOffline = this.offline, message;
+				this.offline =  !navigator.onLine;
+				// Show the snackbar if the user is offline when starting a new session or if the network status changed.
+				if (this.offline || (!this.offline && oldOffline === true)) {
+					this.offline =  !navigator.onLine;
+					// Show the snackbar if the user is offline when starting a new session or if the network status changed.
+					message = this.offline ? 'You are offline' : 'You are online';
+					this._throwSnack(message);
+				}
+			},
+
+			// Elements in the app can notify section changes.
+			// Response by a11y announcing the section and syncronizing the category.
+			_onChangeSection: function(event) {
+				var detail = event.detail;
+				this.categoryName = detail.category || '';
+				// Announce the page's title
+				if (detail.title) {
+					this._announce(detail.title);
+				}
+			},
+
+			// Elements in the app can notify a change to be a11y announced.
+			_onAnnounce: function(e) {
+				this._announce(e.detail);
+			},
+
+			_throwSnack(message) {
+				if (!this._networkSnackbar) {
+					this._networkSnackbar = document.createElement('ajp-snackbar');
+					Polymer.dom(this.root).appendChild(this._networkSnackbar);
+				}
+				Polymer.dom(this._networkSnackbar).innerHTML = message;
+				this._networkSnackbar.open();
+			},
+
+			// A11y announce the given message.
+			_announce: function(message) {
+				this._a11yLabel = '';
+				this.debounce('_a11yAnnouncer', function() {
+					this._a11yLabel = message;
+				}, 100);
+			},
+
+			// This is for performance logging only.
+			_domChange: function(e) {
+				if (window.performance && performance.mark && !this.__loggedDomChange) {
+					var target = Polymer.dom(e).rootTarget;
+					if (target.domHost.is.match(this.page)) {
+						this.__loggedDomChange = true;
+						performance.mark(target.domHost.is + '.domChange');
+					}
+				}
+			}
+
+		});
+
+	</script>
+
+</dom-module>
+
+<!--<paper-progress value="10"></paper-progress>-->

@@ -1,0 +1,83 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="ajp-authentication-styles.html">
+<link rel="import" href="ajp-button.html">
+<link rel="import" href="ajp-input.html">
+
+<dom-module id="ajp-signon">
+
+	<template>
+
+		<style include="ajp-button ajp-input ajp-authentication-styles">
+
+		</style>
+
+		<h2>Sign On</h2>
+
+		<div class="subsection grid" visible$="[[_hasItems]]">
+    	<section>
+
+				<div class="row input-row">
+					<ajp-input>
+						<input type="username" id="accountUsername" name="accountUsername"
+								placeholder="Username" autofocus required
+								aria-labelledby="accountUsernameLabel accountInfoHeading">
+						<ajp-md-decorator error-message="Invalid Username" aria-hidden="true">
+							<label id="accountUsernameLabel">Username</label>
+							<ajp-underline></ajp-underline>
+						</ajp-md-decorator>
+					</ajp-input>
+				</div>
+
+				<div class="row input-row">
+					<ajp-input>
+						<input type="password" id="accountPassword" name="accountPassword"
+								placeholder="Password" required
+								aria-labelledby="accountPasswordLabel accountInfoHeading">
+						<ajp-md-decorator error-message="Invalid Password" aria-hidden="true">
+							<label id="accountPasswordLabel">Password</label>
+							<ajp-underline></ajp-underline>
+						</ajp-md-decorator>
+					</ajp-input>
+				</div>
+
+				<div class="row input-row">
+					<ajp-button>
+						<a href="/user-info">Sign On</a>
+					</ajp-button>
+				</div>
+
+    	</section>
+    	<section>
+
+				<div class="row input-row">
+					<paper-card heading="Do not have an accout?" class="white" elevation="2">
+						<div class="card-content">Go create you account here.</div>
+						<div class="card-actions">
+							<ajp-button>
+								<a href="/signup">Go Sign Up</a>
+							</ajp-button>
+						</div>
+					</paper-card>
+				</div>
+
+    	</section>
+		</div>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-signon',
+
+			properties: {
+
+			}
+
+		});
+
+	</script>
+
+</dom-module>

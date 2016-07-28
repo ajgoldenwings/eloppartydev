@@ -1,0 +1,180 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="ajp-button.html">
+
+<dom-module id="ajp-welcome-page">
+
+<template>
+
+	<style include="ajp-button">
+
+		:host {
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		:host a {
+			color: white;
+		}
+
+		ajp-button > * {
+				border: 2px solid #fff;
+		}
+
+		.text {
+			display: block;
+			font-size: 1.75em;
+			-webkit-margin-before: 0.83em;
+			-webkit-margin-after: 0.83em;
+			-webkit-margin-start: 0px;
+			-webkit-margin-end: 0px;
+			font-weight: bold;
+		}
+
+		.getStarted {
+			border: 2px solid #9A6ED6;
+			background: transparent;
+		}
+
+		.welcome_container {
+			background-image: url([[page_background]]);
+			height:100vh;
+			text-align: center;
+			-webkit-transform-style: preserve-3d;
+			-moz-transform-style: preserve-3d;
+			transform-style: preserve-3d;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+
+		}
+
+		.welcome_footer {
+			position: absolute;
+			width: 100%;
+			margin: 0 auto;
+			bottom: 0;
+			left:0;
+		}
+
+		.welcome_footer_left {
+			padding-top: 1em;
+			padding-left: 1em;
+			padding-right: 1em;
+			padding-bottom: 1em;
+			display: block;
+			font-size:.8em;
+			text-align:left;
+		}
+
+		.welcome_main {
+			width:100%;
+			position:absolute;
+			top:40%;
+		}
+
+		.welcome_main h2 {
+			margin-left: 16px;
+			margin-right: 16px;
+		}
+
+		.welcome_top {
+			position: absolute;
+			width: 100%;
+			margin: 0 auto;
+			height: 10%;
+			min-height: 2em;
+		}
+
+		.welcome_top .current {
+			color: white;
+			display:inline-block;
+		}
+
+		.welcome_top #pagination {
+				color: #9A6ED6;
+				font-size: 1.5em;
+				position: absolute;
+				width: 100%;
+				bottom: .1em;
+		}
+
+	</style>
+
+	<div class="welcome_container" id="welcome_container">
+		<div class="welcome_top">
+			<div id="pagination"></div>
+		</div>
+
+		<div class="welcome_main">
+			<div class="text">{{page_description}}</div>
+			<ajp-button>
+				<a class="text" href="/signon">Get Started</a>
+			</ajp-button>
+		</div>
+
+		<div class="welcome_footer">
+			<div class="welcome_footer_left left">{{picture_description}}<br>{{picture_taken}}</div>
+		</div>
+	</div>
+
+</template>
+
+<script>
+
+	Polymer({
+
+		is: 'ajp-welcome-page',
+
+		properties: {
+
+			current_page: {
+				type: Number,
+				value: -1
+			},
+			total_pages: {
+				type: Number,
+				value: -1
+			},
+			page_background: {
+				type: String,
+				value: ''
+			},
+			page_description: {
+				type: String,
+				value: 'This is a temp page description'
+			},
+			picture_description: {
+				type: String,
+				value: 'This is a temp picture description'
+			},
+			picture_taken: {
+				type: String,
+				value: 'This is a temp date picture taken'
+			}
+
+		},
+
+		ready: function() {
+			this._generatePagination();
+		},
+
+		_generatePagination: function() {
+			for (i = 1; i <= this.total_pages; i++) {
+				var tag = document.createElement("span");
+				if (i == this.current_page) {
+					tag.setAttribute('class', 'current');
+				}
+				tag.innerHTML = '*'
+				this.$.pagination.appendChild(tag);
+			}
+		}
+
+	});
+
+</script>
+
+</dom-module>
