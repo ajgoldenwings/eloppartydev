@@ -88,6 +88,15 @@
 				margin: 0 auto;
 			}
 
+			paper-progress {
+    		--paper-progress-active-color: var(--app-primary-color);
+				--paper-progress-container-color: white;
+				bottom: 0;
+				position: fixed;
+				width: 100%;
+				z-index: 2;
+			}
+
 		</style>
 
 		<app-location route="{{route}}"></app-location>
@@ -99,11 +108,14 @@
 
 			<ajp-app-layout name="main" page="[[page]]"></ajp-app-layout>
 
-			<ajp-authentication-layout name="authentication" page="[[page]]"></ajp-authentication-layout>
+			<ajp-authentication-layout name="authentication" id="authentication" page="[[page]]"></ajp-authentication-layout>
 
 			<ajp-welcome-layout id="welcome" name="welcome"></ajp-welcome-layout>
 
 		</iron-pages>
+
+
+		<paper-progress name="progress" id="progress" hidden indeterminate></paper-progress>
 
 		<!-- a11y announcer -->
 		<div class="announcer" aria-live="assertive">[[_a11yLabel]]</div>
@@ -126,9 +138,20 @@
 					observer: '_pageChanged'
 				},
 
+				registeredUserPages: {
+					type: Object,
+					value: ['events','user-info']
+				},
+
+				unregisteredUserPages: {
+					type: Object,
+					value: ['signon','signup','welcome']
+				},
+
 				getLayout: {
 					type: String
 				}
+
 			},
 
 			observers: [
@@ -154,16 +177,36 @@
 					this.listen(window, 'offline', '_notifyNetworkStatus');
 				});
 
-				this.addEventListener('fireSignUp', this._fireAction);
+				this.addEventListener('fireBaasboxSignOn', this._fireAction);
+				this.addEventListener('fireBaasboxSignUp', this._fireAction);
+				this.addEventListener('fireProgressHide', this._fireAction);
+				this.addEventListener('fireProgressShow', this._fireAction);
+				this.addEventListener('fireSignOnClear', this._fireAction);
+				this.addEventListener('fireSignUpClear', this._fireAction);
 				this.addEventListener('fireShowSnack', this._fireAction);
 			},
 
 			_fireAction: function(event) {
-				switch(event.detail.action) {
-					case 'signUp':
+				switch(event.type) {
+					case 'fireBaasboxSignOn':
+						this.$.baasbox.signOn(event.detail.name, event.detail.password);
+						break
+					case 'fireBaasboxSignUp':
 						this.$.baasbox.signUp(event.detail.name, event.detail.password);
 						break
-					case 'showSnack':
+					case 'fireProgressHide':
+						this.$.progress.setAttribute("hidden",true);
+						break
+					case 'fireProgressShow':
+						this.$.progress.removeAttribute("hidden");
+						break
+					case 'fireSignOnClear':
+						this.$.authentication.$.signon.clearSignOn();
+						break
+					case 'fireSignUpClear':
+						this.$.authentication.$.signup.clearSignUp();
+						break
+					case 'fireShowSnack':
 						this._throwSnack(event.detail.message);
 						break
 					default:
@@ -182,22 +225,30 @@
 						value = 'authentication';
 						break;
 					case 'signup':
-     				// this.$.baasbox.signUp();
 						value = 'authentication';
 						break;
 					default:
 						value = 'main';
 				}
-				this.getLayout = value;
+				return value;
 			},
 
 			_getIronPageValue: function(page) {
-				this.page = page || 'welcome';
+				var currentUser = this.$.baasbox.getCurrentUser();
+				if ((currentUser !== undefined) && (currentUser.username !== undefined) && (this.registeredUserPages.indexOf(page) == -1)) {
+					// TODO: Make 404 page
+					page = 'events';
+				}
+				// else if ((currentUser === undefined) || (this.unregisteredUserPages.indexOf(page) == -1)) {
+				//	// TODO: Make 404 page
+				//	page = page || 'welcome';
+				//}
+				return page || 'welcome';
 			},
 
 			_routePageChanged: function(page) {
-				this._getIronPageValue(page);
-				this._getLayoutValue(this.page);
+				this.page = this._getIronPageValue(page);
+				this.getLayout = this._getLayoutValue(this.page);
 				// Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
 				// with `behavior: 'silent'` to disable header scroll effects during the scroll.
 				Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });

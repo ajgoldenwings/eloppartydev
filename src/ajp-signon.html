@@ -1,68 +1,87 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="ajp-authentication-styles.html">
 <link rel="import" href="ajp-button.html">
+<link rel="import" href="ajp-common-styles.html">
 <link rel="import" href="ajp-input.html">
 
 <dom-module id="ajp-signon">
 
 	<template>
 
-		<style include="ajp-button ajp-input ajp-authentication-styles">
+		<style include="ajp-button ajp-common-styles ajp-input ajp-authentication-styles">
 
 		</style>
 
-		<h2>Sign On</h2>
+		<form
+			id="signonForm"
+			is="iron-form"
+			method="post"
+		>
+			<!--action="/data/sample_success_response.json"
+			on-iron-form-response="_didReceiveResponse"
+			on-iron-form-presubmit="_willSendRequest"-->
 
-		<div class="subsection grid" visible$="[[_hasItems]]">
-    	<section>
+			<h2>Sign On</h2>
 
-				<div class="row input-row">
-					<ajp-input>
-						<input type="username" id="accountUsername" name="accountUsername"
-								placeholder="Username" autofocus required
-								aria-labelledby="accountUsernameLabel accountInfoHeading">
-						<ajp-md-decorator error-message="Invalid Username" aria-hidden="true">
-							<label id="accountUsernameLabel">Username</label>
-							<ajp-underline></ajp-underline>
-						</ajp-md-decorator>
-					</ajp-input>
-				</div>
+			<div class="subsection grid">
+				<section>
 
-				<div class="row input-row">
-					<ajp-input>
-						<input type="password" id="accountPassword" name="accountPassword"
-								placeholder="Password" required
-								aria-labelledby="accountPasswordLabel accountInfoHeading">
-						<ajp-md-decorator error-message="Invalid Password" aria-hidden="true">
-							<label id="accountPasswordLabel">Password</label>
-							<ajp-underline></ajp-underline>
-						</ajp-md-decorator>
-					</ajp-input>
-				</div>
+					<div class="row input-row">
+						<ajp-input>
+							<input type="username" id="accountUsernameSignOn" name="accountUsernameSignOn"
+									placeholder="Username" autofocus required
+									aria-labelledby="accountUsernameSignOnLabel accountInfoHeading">
+							<ajp-md-decorator error-message="Invalid Username" aria-hidden="true">
+								<label id="accountUsernameSignOnLabel">Username</label>
+								<ajp-underline></ajp-underline>
+							</ajp-md-decorator>
+						</ajp-input>
+					</div>
 
-				<div class="row input-row">
-					<ajp-button>
-						<a href="/user-info">Sign On</a>
-					</ajp-button>
-				</div>
+					<div class="row input-row">
+						<ajp-input>
+							<input type="password" id="accountPasswordSignOn" name="accountPasswordSignOn"
+									placeholder="Password" required
+									aria-labelledby="accountPasswordSignOnLabel accountInfoHeading">
+							<ajp-md-decorator error-message="Invalid Password" aria-hidden="true">
+								<label id="accountPasswordSignOnLabel">Password</label>
+								<ajp-underline></ajp-underline>
+							</ajp-md-decorator>
+						</ajp-input>
+					</div>
 
-    	</section>
-    	<section>
+					<div class="row input-row">
+						<ajp-button responsive responsive-1 on-click="_signOn">
+							<a>Sign On</a>
+						</ajp-button>
+					</div>
 
-				<div class="row input-row">
-					<paper-card heading="Do not have an accout?" class="white" elevation="2">
-						<div class="card-content">Go create you account here.</div>
-						<div class="card-actions">
-							<ajp-button>
-								<a href="/signup">Go Sign Up</a>
-							</ajp-button>
-						</div>
-					</paper-card>
-				</div>
+				</section>
+				<section responsive-hidden>
 
-    	</section>
-		</div>
+					<div class="row input-row">
+						<paper-card heading="Do not have an accout?" class="white" elevation="2">
+							<div class="card-content">Go create you account here.</div>
+							<div class="card-actions">
+								<ajp-button responsive responsive-right on-click="clearSignOn">
+									<a href="/signup"><div responsive-show hidden>&#8594; </div>Go Sign Up</a>
+								</ajp-button>
+							</div>
+						</paper-card>
+					</div>
+
+				</section>
+			</div>
+
+		</form>
+
+    <footer>
+			<ajp-button responsive responsive-left on-click="clearSignOn">
+				<a href="/welcome">Go Back</a>
+			</ajp-button>
+    </footer>
 
 	</template>
 
@@ -74,7 +93,56 @@
 
 			properties: {
 
-			}
+			},
+
+			clearSignOn: function(e) {
+				this.$.accountUsernameSignOn.value = '';
+				this.$.accountPasswordSignOn.value = '';
+
+				var form = this.$.signonForm;
+        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+          el.removeAttribute('aria-invalid');
+				}
+			},
+
+      _signOn: function() {
+				if (this._validateForm()) {
+					this.fire('fireBaasboxSignOn', {name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
+				}
+      },
+
+      _validateForm: function() {
+        var form = this.$.signonForm, firstInvalid = false;
+
+        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+          if (el.checkValidity()) {
+            el.removeAttribute('aria-invalid');
+          } else {
+            if (!firstInvalid) {
+              // announce error message
+              if (el.nextElementSibling) {
+                this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+              }
+              if (el.scrollIntoViewIfNeeded) {
+                // safari, chrome
+                el.scrollIntoViewIfNeeded();
+              } else {
+                // firefox, edge, ie
+                el.scrollIntoView(false);
+              }
+              el.focus();
+              firstInvalid = true;
+            }
+            el.setAttribute('aria-invalid', 'true');
+          }
+        }
+
+				if (firstInvalid) {
+					this.fire('fireShowSnack', {message: 'Sign on has failed. Please fill out and try again.'});
+				}
+
+        return !firstInvalid;
+      },
 
 		});
 

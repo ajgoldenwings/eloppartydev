@@ -35,24 +35,56 @@
 				this._setAppCode("1234567890");
       },
 
-			myAction: function(event) {
-				console.log(event.detail);
-				return false;
+      signOn: function(name,password) {
+				this.fire('fireProgressShow');
+				var signOnThis = this;
+				BaasBox.login(name, password)
+				.done(function (user) {
+					signOnThis.fire('fireSignOnClear');
+					signOnThis.set('route.path', '/user-info');
+					signOnThis.fire('fireProgressHide');
+				})
+				.fail(function (err) {
+					signOnThis.fire('fireSignOnClear');
+					signOnThis.fire('fireShowSnack', {message: 'Sign on failed.'});
+					signOnThis.fire('fireProgressHide');
+				});
+      },
+
+			getCurrentUser: function() {
+				return BaasBox.getCurrentUser();
+			},
+
+			currentUser: function() {
+				BaasBox.fetchCurrentUser()
+				.done(function(res) {
+					console.log('res ', res['data']);
+				})
+				.fail(function(error) {
+					console.log('error ', error);
+				});
 			},
 
       signUp: function(name,password) {
+				this.fire('fireProgressShow');
 				var signUpThis = this;
 				BaasBox.fetchUserProfile(name)
 				.done(function(res) {
-					signUpThis.fire('fireShowSnack', {action: 'showSnack', message: 'User Exists.'});
+					signUpThis.fire('fireSignUpClear');
+					signUpThis.fire('fireShowSnack', {message: 'User Exists.'});
+					signUpThis.fire('fireProgressHide');
 				})
 				.fail(function(error) {
 					BaasBox.signup(name, password)
 					.done(function (res) {
+						signUpThis.fire('fireSignUpClear');
 						signUpThis.set('route.path', '/user-info');
+						signUpThis.fire('fireProgressHide');
 					})
 					.fail(function (error) {
-						signUpThis.fire('fireShowSnack', {action: 'showSnack', message: 'Network error. User failed to signup.'});
+						signUpThis.fire('fireSignUpClear');
+						signUpThis.fire('fireShowSnack', {message: 'Network error. User failed to signup.'});
+						signUpThis.fire('fireProgressHide');
 					});
 				});
       },

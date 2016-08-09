@@ -18,11 +18,19 @@
 
 			properties: {
 
-				user: {
-          type: Object,
+				name: {
+					type: String
+				},
+
+				status: {
+					type: String
+				},
+
+				roles: {
+					type: Object,
           value: function() {
-            return {'name':{}};
-          }
+            return [{"name":"unregistered","isrole":false}]
+					}
         }
 
 			},
@@ -36,12 +44,12 @@
       },
 
       clearUser: function() {
-        this.user = {'name':{}};
-				console.log(this.user)
+        this.name = null;
+        this.status = null;
+        this.roles = [{"name":"unregistered","isrole":false}];
       },
 
       _initializeUser: function() {
-				console.log('_initializeUser')
         this.clearUser();
       }
 
