@@ -36,7 +36,7 @@
 
 		<iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
 
-		<ajp-toolbar></ajp-toolbar>
+		<ajp-toolbar page="[[page]]"></ajp-toolbar>
 
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
@@ -46,6 +46,8 @@
 			<ajp-events name="events"></ajp-events>
 
 			<ajp-user-info name="user-info"></ajp-user-info>
+
+			<ajp-settings name="settings" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-settings>
 
 		</iron-pages>
 
@@ -60,9 +62,19 @@
 			properties: {
 				page: {
 					type: String
+				},
+
+				baasbox: {
+					type: Object
+				},
+
+				userName: {
+					type: String,
+					reflectToAttribute: true,
+					value: "Your Username"
 				}
 
-			}
+			},
 
 		});
 

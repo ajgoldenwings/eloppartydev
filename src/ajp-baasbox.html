@@ -35,13 +35,43 @@
 				this._setAppCode("1234567890");
       },
 
+      signOff: function() {
+				this.fire('fireProgressShow');
+				var signOffThis = this;
+
+				if(navigator.onLine){
+					BaasBox.logout()
+					.done(function (user) {
+						signOffThis.set('route.path', '/signon');
+						signOffThis.fire('fireProgressHide');
+					})
+					.fail(function (err) {
+						signOffThis.set('route.path', '/signon');
+						signOffThis.fire('fireShowSnack', {message: 'Logoff failed.'});
+						signOffThis.fire('fireProgressHide');
+					});
+				} else {
+					// Force Sign Off
+  			  var COOKIE_KEY = "baasbox-cookie";
+					if(window.Zepto && window.localStorage) {
+						window.localStorage.removeItem(COOKIE_KEY);
+					} else {
+						$.cookie(COOKIE_KEY, null);
+					}
+					signOffThis.set('route.path', '/signon');
+					signOffThis.fire('fireProgressHide');
+				}
+      },
+
       signOn: function(name,password) {
 				this.fire('fireProgressShow');
 				var signOnThis = this;
 				BaasBox.login(name, password)
 				.done(function (user) {
 					signOnThis.fire('fireSignOnClear');
-					signOnThis.set('route.path', '/user-info');
+					signOnThis.set('route.path', '/');
+					console.log(user.username);
+					signOnThis.fire('firePopulateUserName', {name: user.username});
 					signOnThis.fire('fireProgressHide');
 				})
 				.fail(function (err) {
@@ -51,21 +81,8 @@
 				});
       },
 
-			getCurrentUser: function() {
-				return BaasBox.getCurrentUser();
-			},
-
-			currentUser: function() {
-				BaasBox.fetchCurrentUser()
-				.done(function(res) {
-					console.log('res ', res['data']);
-				})
-				.fail(function(error) {
-					console.log('error ', error);
-				});
-			},
-
       signUp: function(name,password) {
+				console.log(name);
 				this.fire('fireProgressShow');
 				var signUpThis = this;
 				BaasBox.fetchUserProfile(name)
@@ -78,16 +95,26 @@
 					BaasBox.signup(name, password)
 					.done(function (res) {
 						signUpThis.fire('fireSignUpClear');
-						signUpThis.set('route.path', '/user-info');
+						signUpThis.set('route.path', '/');
+						signUpThis.fire('firePopulateUserName', {name: user.username});
 						signUpThis.fire('fireProgressHide');
 					})
 					.fail(function (error) {
 						signUpThis.fire('fireSignUpClear');
-						signUpThis.fire('fireShowSnack', {message: 'Network error. User failed to signup.'});
+						// TODO visibleByAnonymousUsers - need to add usernames, https://github.com/baasbox/baasbox/wiki/Plugin-Engine
+						signUpThis.fire('fireShowSnack', {message: 'Sign up failed. Try again.'});
 						signUpThis.fire('fireProgressHide');
 					});
 				});
       },
+
+			getCurrentUser: function() {
+				return BaasBox.getCurrentUser();
+			},
+
+			getUserName: function() {
+				return this.userName;
+			},
 
 			_setAppCode(appCode) {
 				BaasBox.appcode = appCode;
@@ -95,6 +122,10 @@
 
 			_setEndPoint(endPoint) {
 				BaasBox.setEndPoint(endPoint);
+			},
+
+			_setUserName: function(name) {
+				this.userName = name;
 			},
 
       _initializeBaasbox: function() {

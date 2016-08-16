@@ -29,13 +29,8 @@
 				--app-secondary-color: #757575;
 				--app-accent-color: #172C50;
 				--paper-button-ink-color: var(--app-accent-color);
-				--paper-icon-button-ink-color: var(--app-accent-color);
 				--paper-spinner-color: var(--app-accent-color);
 				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-				color: var(--app-primary-color);
-			}
-
-			paper-icon-button {
 				color: var(--app-primary-color);
 			}
 
@@ -102,11 +97,11 @@
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-		<ajp-baasbox id="baasbox"></ajp-baasbox>
+		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
 
-			<ajp-app-layout name="main" page="[[page]]"></ajp-app-layout>
+			<ajp-app-layout name="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-app-layout>
 
 			<ajp-authentication-layout name="authentication" id="authentication" page="[[page]]"></ajp-authentication-layout>
 
@@ -132,6 +127,10 @@
 			is: 'ajp-app',
 
 			properties: {
+				baasbox: {
+					type: Object
+				},
+
 				page: {
 					type: String,
 					reflectToAttribute: true,
@@ -140,12 +139,18 @@
 
 				registeredUserPages: {
 					type: Object,
-					value: ['events','user-info']
+					value: ['events','user-info','settings']
 				},
 
 				unregisteredUserPages: {
 					type: Object,
 					value: ['signon','signup','welcome']
+				},
+
+				userName: {
+					type: String,
+					reflectToAttribute: true,
+					value: "Your Username"
 				},
 
 				getLayout: {
@@ -177,38 +182,50 @@
 					this.listen(window, 'offline', '_notifyNetworkStatus');
 				});
 
+				this.addEventListener('fireBaasboxSignOff', this._fireAction);
 				this.addEventListener('fireBaasboxSignOn', this._fireAction);
 				this.addEventListener('fireBaasboxSignUp', this._fireAction);
+				this.addEventListener('firePopulateUserName', this._fireAction);
 				this.addEventListener('fireProgressHide', this._fireAction);
 				this.addEventListener('fireProgressShow', this._fireAction);
 				this.addEventListener('fireSignOnClear', this._fireAction);
 				this.addEventListener('fireSignUpClear', this._fireAction);
 				this.addEventListener('fireShowSnack', this._fireAction);
+
+				this.baasbox = this.$.baasbox;
+
+				this._populateUserName();
 			},
 
 			_fireAction: function(event) {
 				switch(event.type) {
+					case 'fireBaasboxSignOff':
+						this.baasbox.signOff();
+						break;
 					case 'fireBaasboxSignOn':
-						this.$.baasbox.signOn(event.detail.name, event.detail.password);
-						break
+						this.baasbox.signOn(event.detail.name, event.detail.password);
+						break;
 					case 'fireBaasboxSignUp':
-						this.$.baasbox.signUp(event.detail.name, event.detail.password);
-						break
+						this.baasbox.signUp(event.detail.name, event.detail.password);
+						break;
+					case 'firePopulateUserName':
+						this._populateUserName(event.detail.name);
+						break;
 					case 'fireProgressHide':
 						this.$.progress.setAttribute("hidden",true);
-						break
+						break;
 					case 'fireProgressShow':
 						this.$.progress.removeAttribute("hidden");
-						break
+						break;
 					case 'fireSignOnClear':
 						this.$.authentication.$.signon.clearSignOn();
-						break
+						break;
 					case 'fireSignUpClear':
 						this.$.authentication.$.signup.clearSignUp();
-						break
+						break;
 					case 'fireShowSnack':
 						this._throwSnack(event.detail.message);
-						break
+						break;
 					default:
 						console.log('There was no matching details for the event.', event);
 				}
@@ -234,17 +251,44 @@
 			},
 
 			_getIronPageValue: function(page) {
+				// TODO: Make 404 page
 				var currentUser = this.$.baasbox.getCurrentUser();
-				if ((currentUser !== undefined) && (currentUser.username !== undefined) && (this.registeredUserPages.indexOf(page) == -1)) {
-					// TODO: Make 404 page
+				if (this._isUserDefined(currentUser) && this._isInRegisteredUserPages(page)) {
+					this.set('route.path', '/');
 					page = 'events';
+				} else if (!this._isUserDefined(currentUser) && this._isInUnregisteredUserPages(page)) {
+					this.set('route.path', '/signon');
+					page = 'signon';
 				}
-				// else if ((currentUser === undefined) || (this.unregisteredUserPages.indexOf(page) == -1)) {
-				//	// TODO: Make 404 page
-				//	page = page || 'welcome';
-				//}
 				return page || 'welcome';
 			},
+
+			_isInRegisteredUserPages: function(page) {
+				return this.registeredUserPages.indexOf(page) == -1;
+			},
+
+			_isInUnregisteredUserPages: function(page) {
+				return this.unregisteredUserPages.indexOf(page) == -1;
+			},
+
+			_isUserDefined: function(currentUser) {
+				return currentUser !== undefined && currentUser != null && currentUser.username !== undefined;
+			},
+
+			_populateUserName: function(name) {
+				if (name === undefined && this.userName == "Your Username") {
+					var currentUser = this.baasbox.getCurrentUser();
+					name = currentUser && currentUser.username || "Your Username";
+				}
+				this._setUserName(name);
+			},
+
+			_setUserName: function(name) {
+				this.userName = name;
+			},
+
+
+
 
 			_routePageChanged: function(page) {
 				this.page = this._getIronPageValue(page);
@@ -353,5 +397,3 @@
 	</script>
 
 </dom-module>
-
-<!--<paper-progress value="10"></paper-progress>-->
