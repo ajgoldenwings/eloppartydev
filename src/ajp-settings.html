@@ -1,19 +1,16 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="styles/ajp-common-styles.html">
 
 <dom-module id="ajp-settings">
 
 	<template>
 
-		<style>
+		<style include="ajp-common-styles">
 			h2, h4 {
 				padding: 0 0 6px 16px;
 				margin: 19.95px 0 0 0;
-			}
-
-			.border-bottom {
-				border-bottom: 1px solid #eee;
 			}
 
 			.paper-item-link {
@@ -37,7 +34,7 @@
 					<div secondary>[[userName]]</div>
 				</paper-item-body>
 			</paper-item>
-			<a class="paper-item-link" href="/change-password" tabindex="-1">
+			<a class="paper-item-link" href="/change-password-current" tabindex="-1">
 				<paper-item>Password</paper-item>
 			</a>
 		</div>

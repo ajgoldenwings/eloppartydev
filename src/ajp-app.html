@@ -139,7 +139,14 @@
 
 				registeredUserPages: {
 					type: Object,
-					value: ['events','user-info','settings']
+					value: [
+						'events',
+						'user-info',
+						'settings',
+						'change-password-current',
+						'change-password-confirm',
+						'change-password-new'
+					]
 				},
 
 				unregisteredUserPages: {
@@ -227,7 +234,7 @@
 						this._throwSnack(event.detail.message);
 						break;
 					default:
-						console.log('There was no matching details for the event.', event);
+						console.error('There was no matching details for the event.', event);
 				}
 			},
 
@@ -286,9 +293,6 @@
 			_setUserName: function(name) {
 				this.userName = name;
 			},
-
-
-
 
 			_routePageChanged: function(page) {
 				this.page = this._getIronPageValue(page);

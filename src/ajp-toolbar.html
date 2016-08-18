@@ -42,15 +42,28 @@
 				pointer-events: auto;
 			}
 
+			.to-settings  {
+				display: none;
+			}
+
 			:host {
 				--paper-icon-button-ink-color: var(--app-accent-color);
 			}
 
-			:host(:not([page=settings])) .back-btn  {
+			.back-btn, .to-settings  {
 				display: none;
 			}
 
-			:host([page=settings]) .logo {
+			:host([page=settings]) .back-btn  {
+				display: flex;
+			}
+
+			:host([page=change-password-current]) .to-settings  {
+				display: flex;
+			}
+
+			:host([page=settings]) .logo,
+			:host([page=change-password-current]) .logo {
 				padding-right: 40px;
 			}
 
@@ -60,6 +73,11 @@
 			<app-toolbar>
 				<div class="left-bar-item">
 					<a class="back-btn" href="/" tabindex="-1">
+						<paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
+					</a>
+				</div>
+				<div class="left-bar-item">
+					<a class="to-settings" href="/settings">
 						<paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
 					</a>
 				</div>

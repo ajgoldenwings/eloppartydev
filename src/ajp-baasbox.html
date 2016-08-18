@@ -70,7 +70,6 @@
 				.done(function (user) {
 					signOnThis.fire('fireSignOnClear');
 					signOnThis.set('route.path', '/');
-					console.log(user.username);
 					signOnThis.fire('firePopulateUserName', {name: user.username});
 					signOnThis.fire('fireProgressHide');
 				})
@@ -82,7 +81,6 @@
       },
 
       signUp: function(name,password) {
-				console.log(name);
 				this.fire('fireProgressShow');
 				var signUpThis = this;
 				BaasBox.fetchUserProfile(name)
