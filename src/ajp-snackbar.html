@@ -77,7 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       open: function() {
         Polymer.dom.flush();
         this.offsetHeight && this.classList.add('opened');
-        this.debounce('_close', this.close, 4000);
+        this.debounce('_close', this.close, 3500);
       },
 
       close: function() {

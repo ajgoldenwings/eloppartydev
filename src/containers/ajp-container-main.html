@@ -1,0 +1,172 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../ajp-toolbar.html">
+
+<dom-module id="ajp-container-main">
+
+	<template>
+
+		<style>
+
+			:host {
+				display: block;
+				padding-top: 64px;
+			}
+
+			iron-pages {
+				/*min-height: 100vh;
+				max-width: 1440px;
+				margin: 0 auto;*/
+
+        margin: 0 auto;
+        padding: 0 24px 48px 24px;
+        max-width: 900px;
+        overflow: hidden;
+			}
+
+			/* small screen */
+			@media (max-width: 767px) {
+				:host {
+
+				}
+			}
+
+		</style>
+
+		<iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
+
+		<ajp-toolbar page="[[page]]"></ajp-toolbar>
+
+		<app-location route="{{route}}"></app-location>
+		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+
+			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"></ajp-change-password-current>
+
+			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"></ajp-change-password-confirm>
+
+			<ajp-change-password-new name="change-password-new" id="changepasswordnew"></ajp-change-password-new>
+
+			<ajp-events name="events"></ajp-events>
+
+			<ajp-user-info name="user-info"></ajp-user-info>
+
+			<ajp-settings name="settings" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-settings>
+
+		</iron-pages>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-container-main',
+
+			properties: {
+				baasbox: {
+					type: Object
+				},
+
+				page: {
+					type: String
+				},
+
+				tempPasswordCurrent: {
+					type: String
+				},
+
+				tempPasswordNew: {
+					type: String
+				},
+
+				userName: {
+					type: String,
+					reflectToAttribute: true,
+					value: "Your Username"
+				},
+
+			},
+
+      ready: function() {
+				this.addEventListener('clearForms',               this._fireAction);
+				this.addEventListener('clearPasswordConfirm',     this._fireAction);
+				this.addEventListener('passwordChangeValidate',   this._fireAction);
+				this.addEventListener('passwordCurrentConfirmSet',this._fireAction);
+				this.addEventListener('passwordReady',            this._fireAction);
+				this.addEventListener('passwordNewSetToConfirm',  this._fireAction);
+				this.addEventListener('passwordStoreCurrent',     this._fireAction);
+      },
+
+			_fireAction: function(event) {
+				switch(event.type) {
+					case 'clearForms':               this.clearForms();                                   break;
+					case 'clearPasswordConfirm':     this.clearPasswordConfirm();                         break;
+					case 'passwordChangeValidate':   this._passwordChangeValidate(event.detail.password); break;
+					case 'passwordCurrentConfirmSet':this.$.changepasswordcurrent.setConfirmed(true);     break;
+					case 'passwordReady':            this._passwordReady();                               break;
+					case 'passwordNewSetToConfirm':  this._passwordNewSetToConfirm(event.detail.password);break;
+					case 'passwordStoreCurrent':     this.passwordStoreCurrent(event.detail.password);    break;
+					default:console.error('There was no matching details for the event that was listened by the main container.', event);
+				}
+			},
+
+			clearForms: function(e) {
+				if (this.$.changepasswordcurrent.createdCallback !== undefined) {
+					this.$.changepasswordcurrent.clearForm();
+				}
+				if (this.$.changepasswordconfirm.createdCallback !== undefined) {
+					this.$.changepasswordconfirm.clearForm();
+				}
+				if (this.$.changepasswordnew.createdCallback !== undefined) {
+					this.$.changepasswordnew.clearForm();
+				}
+
+				this.tempPasswordCurrent = '';
+				this.tempPasswordNew = '';
+			},
+
+			clearPasswordConfirm: function(e) {
+				if (this.$.changepasswordcurrent.createdCallback !== undefined) {
+					this.$.changepasswordcurrent.resetConfirmed();
+				}
+			},
+
+			passwordStoreCurrent: function(password) {
+				this.tempPasswordCurrent = password;
+			},
+
+			_passwordChangeValidate: function(password) {
+				if (password == this.tempPasswordNew) {
+					this.fire('Baasbox', {typeFire: 'passwordChange', passwordCurrent: this.tempPasswordCurrent, password: password});
+				} else {
+					this.fire('Main', {typeFire: 'clearForms'});
+					this.fire('Main', {typeFire: 'clearPasswordConfirm'});
+					this.set('route.path', '/settings');
+					this.fire('App', {typeFire: 'showSnack', message: 'Passwords do not match.'});
+				}
+			},
+
+			_passwordReady() {
+				if (this.$.changepasswordcurrent.isConfirmed === undefined || !this.$.changepasswordcurrent.isConfirmed()) {
+					this.set('route.path', '/settings');
+				}
+			},
+
+			_passwordNewSetToConfirm(password) {
+				this.set('route.path', '/change-password-confirm');
+				if (password !== undefined) {
+					this.tempPasswordNew = password;
+					this.$.changepasswordnew.clearForm();
+				} else {
+					this.set('route.path', '/settings');
+				}
+			}
+
+		});
+
+	</script>
+
+</dom-module>

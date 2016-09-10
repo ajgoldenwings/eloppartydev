@@ -33,22 +33,74 @@
       ready: function() {
 				this._setEndPoint("https://baasbox.elopparty.com");
 				this._setAppCode("1234567890");
+
+				this.addEventListener('passwordChange',     this._fireAction);
+				this.addEventListener('passwordTestCurrent',this._fireAction);
+				this.addEventListener('signOff',            this._fireAction);
+				this.addEventListener('signOn',             this._fireAction);
+      },
+
+			_fireAction: function(event) {
+				switch(event.type) {
+					case 'passwordChange':     this.passwordChange(event.detail.passwordCurrent,event.detail.password);break;
+					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.password);                        break;
+					case 'signOff':            this.signOff();                                                         break;
+					case 'signOn':             this.signOn(event.detail.name, event.detail.password);                  break;
+					default:console.error('There was no matching details for the event that was listened by baasbox.', event);
+				}
+			},
+
+			passwordChange: function(passwordCurrent, password) {
+				this.fire('App', {typeFire: 'progressShow'});
+				var thisFunc = this;
+				BaasBox.changePassword(passwordCurrent, password)
+				.done(function(res) {
+					thisFunc.fire('Main', {typeFire: 'clearForms'});
+					thisFunc.fire('Main', {typeFire: 'clearPasswordConfirm'});
+					thisFunc.set('route.path', '/settings');
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Password changed.'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
+				})
+				.fail(function(error) {
+					thisFunc.fire('Main', {typeFire: 'clearForms'});
+					thisFunc.fire('Main', {typeFire: 'clearPasswordConfirm'});
+					thisFunc.set('route.path', '/settings');
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Something went wrong when changing your password.'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
+				});
+			},
+
+      currentPasswordTest: function(password) {
+				this.fire('App', {typeFire: 'progressShow'});
+				var thisFunc = this;
+				BaasBox.login(this._getUserName(), password)
+				.done(function (user) {
+					thisFunc.set('route.path', '/change-password-new');
+					thisFunc.fire('Main', {typeFire: 'clearForms'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
+					thisFunc.fire('Main', {typeFire: 'passwordCurrentConfirmSet'});
+					thisFunc.fire('Main', {typeFire: 'passwordStoreCurrent', password: password});
+				})
+				.fail(function (err) {
+					thisFunc.fire('Main', {typeFire: 'clearForms'});
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'That is not your current password.'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
+				});
       },
 
       signOff: function() {
-				this.fire('fireProgressShow');
-				var signOffThis = this;
-
+				this.fire('App', {typeFire: 'progressShow'});
+				var thisFunc = this;
 				if(navigator.onLine){
 					BaasBox.logout()
 					.done(function (user) {
-						signOffThis.set('route.path', '/signon');
-						signOffThis.fire('fireProgressHide');
+						thisFunc.set('route.path', '/signon');
+						thisFunc.fire('App', {typeFire: 'progressHide'});
 					})
 					.fail(function (err) {
-						signOffThis.set('route.path', '/signon');
-						signOffThis.fire('fireShowSnack', {message: 'Logoff failed.'});
-						signOffThis.fire('fireProgressHide');
+						thisFunc.set('route.path', '/signon');
+						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Logoff failed.'});
+						thisFunc.fire('App', {typeFire: 'progressHide'});
 					});
 				} else {
 					// Force Sign Off
@@ -58,50 +110,50 @@
 					} else {
 						$.cookie(COOKIE_KEY, null);
 					}
-					signOffThis.set('route.path', '/signon');
-					signOffThis.fire('fireProgressHide');
+					thisFunc.set('route.path', '/signon');
+					thisFunc.fire('App', {typeFire: 'progressHide'});
 				}
       },
 
       signOn: function(name,password) {
-				this.fire('fireProgressShow');
-				var signOnThis = this;
+				this.fire('App', {typeFire: 'progressShow'});
+				var thisFunc = this;
 				BaasBox.login(name, password)
 				.done(function (user) {
-					signOnThis.fire('fireSignOnClear');
-					signOnThis.set('route.path', '/');
-					signOnThis.fire('firePopulateUserName', {name: user.username});
-					signOnThis.fire('fireProgressHide');
+					thisFunc.set('route.path', '/');
+					thisFunc.fire('Authentication', {typeFire: 'signOnClear'});
+					thisFunc.fire('Main', {typeFire: 'populateUserName', name: user.username});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
 				})
 				.fail(function (err) {
-					signOnThis.fire('fireSignOnClear');
-					signOnThis.fire('fireShowSnack', {message: 'Sign on failed.'});
-					signOnThis.fire('fireProgressHide');
+					thisFunc.fire('Authentication', {typeFire: 'signOnClear'});
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Sign on failed.'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
 				});
       },
 
       signUp: function(name,password) {
-				this.fire('fireProgressShow');
-				var signUpThis = this;
+				this.fire('App', {typeFire: 'progressShow'});
+				var thisFunc = this;
 				BaasBox.fetchUserProfile(name)
 				.done(function(res) {
-					signUpThis.fire('fireSignUpClear');
-					signUpThis.fire('fireShowSnack', {message: 'User Exists.'});
-					signUpThis.fire('fireProgressHide');
+					thisFunc.fire('fireSignUpClear');
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'User Exists.'});
+					thisFunc.fire('App', {typeFire: 'progressHide'});
 				})
 				.fail(function(error) {
 					BaasBox.signup(name, password)
 					.done(function (res) {
-						signUpThis.fire('fireSignUpClear');
-						signUpThis.set('route.path', '/');
-						signUpThis.fire('firePopulateUserName', {name: user.username});
-						signUpThis.fire('fireProgressHide');
+						thisFunc.fire('fireSignUpClear');
+						thisFunc.set('route.path', '/');
+						thisFunc.fire('firePopulateUserName', {name: user.username});
+						thisFunc.fire('App', {typeFire: 'progressHide'});
 					})
 					.fail(function (error) {
-						signUpThis.fire('fireSignUpClear');
+						thisFunc.fire('fireSignUpClear');
 						// TODO visibleByAnonymousUsers - need to add usernames, https://github.com/baasbox/baasbox/wiki/Plugin-Engine
-						signUpThis.fire('fireShowSnack', {message: 'Sign up failed. Try again.'});
-						signUpThis.fire('fireProgressHide');
+						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Sign up failed. Try again.'});
+						thisFunc.fire('App', {typeFire: 'progressHide'});
 					});
 				});
       },
@@ -110,8 +162,8 @@
 				return BaasBox.getCurrentUser();
 			},
 
-			getUserName: function() {
-				return this.userName;
+			_getUserName: function() {
+				return BaasBox.getCurrentUser().username;
 			},
 
 			_setAppCode(appCode) {

@@ -9,9 +9,9 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <!-- Since 'welcome' is the default route, eagerly load it. -->
-<link rel="import" href="ajp-welcome.html">
-<link rel="import" href="ajp-app-layout.html">
-<link rel="import" href="ajp-authentication-layout.html">
+<link rel="import" href="containers/ajp-container-welcome.html">
+<link rel="import" href="containers/ajp-container-main.html">
+<link rel="import" href="containers/ajp-container-authentication.html">
 <link rel="import" href="ajp-baasbox.html">
 <link rel="import" href="ajp-toolbar.html">
 
@@ -101,14 +101,13 @@
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
 
-			<ajp-app-layout name="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-app-layout>
+			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-container-main>
 
-			<ajp-authentication-layout name="authentication" id="authentication" page="[[page]]"></ajp-authentication-layout>
+			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]"></ajp-container-authentication>
 
-			<ajp-welcome-layout id="welcome" name="welcome"></ajp-welcome-layout>
+			<ajp-container-welcome id="welcome" name="welcome"></ajp-container-welcome>
 
 		</iron-pages>
-
 
 		<paper-progress name="progress" id="progress" hidden indeterminate></paper-progress>
 
@@ -189,15 +188,26 @@
 					this.listen(window, 'offline', '_notifyNetworkStatus');
 				});
 
-				this.addEventListener('fireBaasboxSignOff', this._fireAction);
-				this.addEventListener('fireBaasboxSignOn', this._fireAction);
-				this.addEventListener('fireBaasboxSignUp', this._fireAction);
-				this.addEventListener('firePopulateUserName', this._fireAction);
-				this.addEventListener('fireProgressHide', this._fireAction);
-				this.addEventListener('fireProgressShow', this._fireAction);
-				this.addEventListener('fireSignOnClear', this._fireAction);
-				this.addEventListener('fireSignUpClear', this._fireAction);
-				this.addEventListener('fireShowSnack', this._fireAction);
+				this.addEventListener('App',           this._fireAction);
+				this.addEventListener('Authentication',this._fireAction);
+				this.addEventListener('Baasbox',       this._fireAction);
+				this.addEventListener('Main',          this._fireAction);
+
+//this.addEventListener('fireBaasboxSignOff',this._fireAction);//this.addEventListener('fireBaasboxSignOn',this._fireAction);
+				this.addEventListener('fireBaasboxSignUp',            this._fireAction);
+				this.addEventListener('fireHideSnack',                this._fireAction);
+// this.addEventListener('fireClearForms',this._fireAction);
+				this.addEventListener('fireClearPasswordConfirm',     this._fireAction);
+				this.addEventListener('firePasswordChange',           this._fireAction);
+				this.addEventListener('firePasswordCurrentConfirmSet',this._fireAction);
+//this.addEventListener('firePasswordNewReady',this._fireAction);
+//this.addEventListener('firePasswordNewSetToConfirm',  this._fireAction);//this.addEventListener('firePasswordStoreCurrent',this._fireAction);//this.addEventListener('firePasswordTestCurrent',this._fireAction);
+				this.addEventListener('firePopulateUserName',         this._fireAction);
+				//this.addEventListener('fireProgressHide',this._fireAction);//this.addEventListener('fireProgressShow',this._fireAction);
+				this.addEventListener('fireSettings',                 this._fireAction);
+				// this.addEventListener('fireSignOnClear',              this._fireAction);
+				this.addEventListener('fireSignUpClear',              this._fireAction);
+				this.addEventListener('fireShowSnack',                this._fireAction);
 
 				this.baasbox = this.$.baasbox;
 
@@ -206,53 +216,48 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
-					case 'fireBaasboxSignOff':
-						this.baasbox.signOff();
-						break;
-					case 'fireBaasboxSignOn':
-						this.baasbox.signOn(event.detail.name, event.detail.password);
-						break;
-					case 'fireBaasboxSignUp':
-						this.baasbox.signUp(event.detail.name, event.detail.password);
-						break;
-					case 'firePopulateUserName':
-						this._populateUserName(event.detail.name);
-						break;
-					case 'fireProgressHide':
-						this.$.progress.setAttribute("hidden",true);
-						break;
-					case 'fireProgressShow':
-						this.$.progress.removeAttribute("hidden");
-						break;
-					case 'fireSignOnClear':
-						this.$.authentication.$.signon.clearSignOn();
-						break;
-					case 'fireSignUpClear':
-						this.$.authentication.$.signup.clearSignUp();
-						break;
-					case 'fireShowSnack':
-						this._throwSnack(event.detail.message);
-						break;
-					default:
-						console.error('There was no matching details for the event.', event);
+					case 'App':           this._fireActionApp(       event.detail.typeFire, event.detail);break;
+					case 'Authentication':this.$.authentication.fire(event.detail.typeFire, event.detail);break;
+					case 'Baasbox':       this.baasbox.fire(         event.detail.typeFire, event.detail);break;
+					case 'Main':          this.$.main.fire(          event.detail.typeFire, event.detail);break;
+
+
+// case 'fireBaasboxSignOff':this.baasbox.signOff();break;// case 'fireBaasboxSignOn':this.baasbox.signOn(event.detail.name, event.detail.password);break;
+					// case 'fireBaasboxSignUp':            this.baasbox.signUp(event.detail.name, event.detail.password);                   break;
+// case 'fireHideSnack':this._hideSnack();break;// case 'fireClearForms':this.$.main.clearForms();break;// case 'fireClearPasswordConfirm':this.$.main.clearPasswordConfirm();break;
+					// case 'firePasswordChange':           this.baasbox.changePassword(event.detail.password, event.detail.passwordCurrent);break;
+					// case 'firePasswordCurrentConfirmSet':this.$.main.$.changepasswordcurrent.setConfirmed(true);                          break;
+// case 'firePasswordNewReady':this._passwordNewReady();break;
+// case 'firePasswordNewSetToConfirm':  this._passwordNewSetToConfirm();break;
+// case 'firePasswordStoreCurrent':this.$.main.passwordStoreCurrent(event.detail.password);break;
+					// case 'firePasswordTestCurrent':      this.baasbox.currentPasswordTest(event.detail.password);                         break;
+					// case 'firePopulateUserName':         this._populateUserName(event.detail.name);                                       break;
+// case 'fireProgressHide':this.$.progress.setAttribute("hidden",true);break;// case 'fireProgressShow':this.$.progress.removeAttribute("hidden");break;// case 'fireSettings':this.set('route.path', '/settings');break;
+					// case 'fireSignOnClear':              this.$.authentication.$.signon.clearSignOn();                                    break;
+					// case 'fireSignUpClear':              this.$.authentication.$.signup.clearSignUp();                                    break;
+// case 'fireShowSnack':this._throwSnack(event.detail.message);break;
+					default:console.error('There was no matching details for the event that was listened by the app.', event);
+				}
+			},
+
+			_fireActionApp: function(type) {
+				switch(type) {
+					case 'hideSnack':   this._hideSnack();                          break;
+					case 'progressHide':this.$.progress.setAttribute("hidden",true);break;
+					case 'progressShow':this.$.progress.removeAttribute("hidden");  break;
+					case 'showSnack':   this._throwSnack(event.detail.message);     break;
+
+					default:console.error('There was no matching function for the app event.', event);
 				}
 			},
 
 			_getLayoutValue: function(page) {
 				var value;
 				switch(page) {
-					case 'welcome':
-						value = 'welcome';
-     				this.$.welcome.resetSelectedValue();
-						break;
-					case 'signon':
-						value = 'authentication';
-						break;
-					case 'signup':
-						value = 'authentication';
-						break;
-					default:
-						value = 'main';
+					case 'welcome':value = 'welcome';this.$.welcome.resetSelectedValue();break;
+					case 'signon': value = 'authentication';                             break;
+					case 'signup': value = 'authentication';                             break;
+					default:       value = 'main';
 				}
 				return value;
 			},
@@ -268,6 +273,10 @@
 					page = 'signon';
 				}
 				return page || 'welcome';
+			},
+
+			_hideSnack: function() {
+				this._networkSnackbar.close();
 			},
 
 			_isInRegisteredUserPages: function(page) {
@@ -301,7 +310,7 @@
 				// with `behavior: 'silent'` to disable header scroll effects during the scroll.
 				Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
 				// Close the drawer - in case the *route* change came from a link in the drawer.
-				this.drawerOpened = false;
+				// this.drawerOpened = false;
 			},
 
 			_pageChanged: function(page, oldPage) {
@@ -371,6 +380,7 @@
 			_throwSnack(message) {
 				if (!this._networkSnackbar) {
 					this._networkSnackbar = document.createElement('ajp-snackbar');
+					this._networkSnackbar.setAttribute("onClick","this.fire('App', {typeFire: 'hideSnack'})");
 					Polymer.dom(this.root).appendChild(this._networkSnackbar);
 				}
 				Polymer.dom(this._networkSnackbar).innerHTML = message;

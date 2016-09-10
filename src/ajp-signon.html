@@ -107,7 +107,8 @@
 
       _signOn: function() {
 				if (this._validateForm()) {
-					this.fire('fireBaasboxSignOn', {name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
+					console.log(this.$.accountUsernameSignOn.value, this.$.accountPasswordSignOn.value);
+					this.fire('Baasbox', {typeFire: 'signOn', name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
 				}
       },
 

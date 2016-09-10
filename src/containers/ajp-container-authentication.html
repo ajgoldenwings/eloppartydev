@@ -1,11 +1,11 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="styles/ajp-button.html">
-<link rel="import" href="styles/ajp-common-styles.html">
-<link rel="import" href="ajp-toolbar.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../styles/ajp-button.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="../ajp-toolbar.html">
 
-<dom-module id="ajp-authentication-layout">
+<dom-module id="ajp-container-authentication">
 
 	<template>
 
@@ -58,11 +58,22 @@
 
 		Polymer({
 
-			is: 'ajp-authentication-layout',
+			is: 'ajp-container-authentication',
 
 			properties: {
 				page: {
 					type: String
+				}
+			},
+
+      ready: function() {
+				this.addEventListener('signOnClear', this._fireAction);
+      },
+
+			_fireAction: function(event) {
+				switch(event.type) {
+					case 'signOnClear': this.$.signon.clearSignOn(); break;                                                      break;
+					default:console.error('There was no matching details for the event that was listened by the authentication container.', event);
 				}
 			}
 

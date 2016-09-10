@@ -77,7 +77,8 @@
       },
 
       _signOff: function() {
-				this.fire('fireBaasboxSignOff');
+				//this.fire('fireBaasboxSignOff');
+				this.fire('Baasbox', {typeFire: 'signOff'});
       }
 
 		});
