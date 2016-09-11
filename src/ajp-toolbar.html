@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="styles/ajp-common-styles.html">
 
 <dom-module id="ajp-toolbar">
@@ -50,7 +51,7 @@
 				--paper-icon-button-ink-color: var(--app-accent-color);
 			}
 
-			.back-btn, .to-settings  {
+			.back-btn, .to-settings {
 				display: none;
 			}
 
@@ -85,7 +86,12 @@
 						<paper-icon-button icon="arrow-back" aria-label="Go back" on-click="_clearForms"></paper-icon-button>
 					</a>
 				</div>
-				<div class="logo" title><a href="/" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
+
+				<iron-pages id="logo" role="titleLink" selected="[[title]]" attr-for-selected="name" selected-attribute="visible" selected="home" fallbackSelection="home" title>
+					<div class="logo action" name="action"><a href="/" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
+					<div class="logo home" name="home"><a href="/action" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
+				</iron-pages>
+
 			</app-toolbar>
 		</app-header>
 
@@ -100,6 +106,13 @@
 			properties: {
 				page: {
 					type: String,
+					reflectToAttribute: true, /* What is this property */
+					observer: '_pageChanged'
+				},
+
+				title: {
+					value: "home",
+					type: String,
 					reflectToAttribute: true /* What is this property */
 				}
 			},
@@ -107,6 +120,14 @@
 			_clearForms: function(e) {
 				this.fire('Main', {typeFire: 'clearForms'});
 				this.fire('Main', {typeFire: 'clearPasswordConfirm'});
+			},
+
+			_pageChanged: function(page, oldPage) {
+				if (page == 'events') {
+					this.title = 'home';
+				} else {
+					this.title = 'action';
+				}
 			}
 
 		});

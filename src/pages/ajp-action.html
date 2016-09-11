@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+
+<dom-module id="ajp-action">
+
+	<template>
+
+		<style include="ajp-common-styles">
+			h2, h4 {
+				padding: 0 0 6px 16px;
+				margin: 19.95px 0 0 0;
+			}
+
+			.paper-item-link {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			:host([two-line]) {
+				min-height: 0;
+			}
+		</style>
+
+		<h2>Settings</h2>
+
+		<h4 class="border-bottom">My Account</h4>
+
+		<div role="listbox">
+			<paper-item class="border-bottom">
+				<paper-item-body two-line>
+					<div>Username</div>
+					<div secondary>[[userName]]</div>
+				</paper-item-body>
+			</paper-item>
+			<a class="paper-item-link" href="/change-password-current" tabindex="-1">
+				<paper-item>Password</paper-item>
+			</a>
+		</div>
+
+		<h4 class="border-bottom">Account Actions</h4>
+
+		<div role="listbox">
+			<a class="paper-item-link" on-click="_signOff" tabindex="-1">
+				<paper-item>Log Out</paper-item>
+			</a>
+		</div>
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-action',
+
+			properties: {
+				baasbox: {
+					type: Object
+				},
+
+				userName: {
+					type: String,
+					reflectToAttribute: true,
+					value: "Your Username"
+				}
+			},
+
+			ready: function() {
+				// this.userName = this._getUserName();
+			},
+
+      _getUserName: function() {
+				var currentUser = this.baasbox.getCurrentUser();
+				return  currentUser.username ||"Your Username";
+      },
+
+      _signOff: function() {
+				//this.fire('fireBaasboxSignOff');
+				this.fire('Baasbox', {typeFire: 'signOff'});
+      }
+
+		});
+
+	</script>
+
+</dom-module>

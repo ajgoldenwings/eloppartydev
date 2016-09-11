@@ -100,13 +100,9 @@
 		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-
 			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-container-main>
-
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]"></ajp-container-authentication>
-
-			<ajp-container-welcome id="welcome" name="welcome"></ajp-container-welcome>
-
+			<ajp-container-welcome name="welcome" id="welcome"></ajp-container-welcome>
 		</iron-pages>
 
 		<paper-progress name="progress" id="progress" hidden indeterminate></paper-progress>
@@ -139,6 +135,7 @@
 				registeredUserPages: {
 					type: Object,
 					value: [
+						'action',
 						'events',
 						'user-info',
 						'settings',

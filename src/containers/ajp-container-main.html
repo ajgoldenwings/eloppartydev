@@ -40,19 +40,13 @@
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-
+			<ajp-action name="action"></ajp-action>
 			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"></ajp-change-password-current>
-
 			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"></ajp-change-password-confirm>
-
 			<ajp-change-password-new name="change-password-new" id="changepasswordnew"></ajp-change-password-new>
-
 			<ajp-events name="events"></ajp-events>
-
 			<ajp-user-info name="user-info"></ajp-user-info>
-
 			<ajp-settings name="settings" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-settings>
-
 		</iron-pages>
 
 	</template>
