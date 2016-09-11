@@ -38,6 +38,7 @@
 				this.addEventListener('passwordTestCurrent',this._fireAction);
 				this.addEventListener('signOff',            this._fireAction);
 				this.addEventListener('signOn',             this._fireAction);
+				this.addEventListener('signUp',             this._fireAction);
       },
 
 			_fireAction: function(event) {
@@ -46,6 +47,7 @@
 					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.password);                        break;
 					case 'signOff':            this.signOff();                                                         break;
 					case 'signOn':             this.signOn(event.detail.name, event.detail.password);                  break;
+					case 'signUp':             this.signUp(event.detail.name, event.detail.password);                  break;
 					default:console.error('There was no matching details for the event that was listened by baasbox.', event);
 				}
 			},
@@ -57,9 +59,10 @@
 				.done(function(res) {
 					thisFunc.fire('Main', {typeFire: 'clearForms'});
 					thisFunc.fire('Main', {typeFire: 'clearPasswordConfirm'});
-					thisFunc.set('route.path', '/settings');
+					// thisFunc.set('route.path', '/settings');
 					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Password changed.'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
+					// thisFunc.fire('App', {typeFire: 'progressHide'});
+					thisFunc.signOn(thisFunc._getUserName(),password);
 				})
 				.fail(function(error) {
 					thisFunc.fire('Main', {typeFire: 'clearForms'});
@@ -122,7 +125,7 @@
 				.done(function (user) {
 					thisFunc.set('route.path', '/');
 					thisFunc.fire('Authentication', {typeFire: 'signOnClear'});
-					thisFunc.fire('Main', {typeFire: 'populateUserName', name: user.username});
+					thisFunc.fire('App', {typeFire: 'populateUserName', name: user.username});
 					thisFunc.fire('App', {typeFire: 'progressHide'});
 				})
 				.fail(function (err) {
@@ -137,20 +140,20 @@
 				var thisFunc = this;
 				BaasBox.fetchUserProfile(name)
 				.done(function(res) {
-					thisFunc.fire('fireSignUpClear');
+					thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
 					thisFunc.fire('App', {typeFire: 'showSnack', message: 'User Exists.'});
 					thisFunc.fire('App', {typeFire: 'progressHide'});
 				})
 				.fail(function(error) {
 					BaasBox.signup(name, password)
 					.done(function (res) {
-						thisFunc.fire('fireSignUpClear');
+						thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
 						thisFunc.set('route.path', '/');
-						thisFunc.fire('firePopulateUserName', {name: user.username});
+						thisFunc.fire('App', {typeFire: 'populateUserName', name: user.username});
 						thisFunc.fire('App', {typeFire: 'progressHide'});
 					})
 					.fail(function (error) {
-						thisFunc.fire('fireSignUpClear');
+						thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
 						// TODO visibleByAnonymousUsers - need to add usernames, https://github.com/baasbox/baasbox/wiki/Plugin-Engine
 						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Sign up failed. Try again.'});
 						thisFunc.fire('App', {typeFire: 'progressHide'});
@@ -163,7 +166,7 @@
 			},
 
 			_getUserName: function() {
-				return BaasBox.getCurrentUser().username;
+				return this.getCurrentUser().username;
 			},
 
 			_setAppCode(appCode) {

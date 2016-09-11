@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/swipe-pages/swipe-pages.html">
-<link rel="import" href="../ajp-welcome-page.html">
+<link rel="import" href="../pages/ajp-welcome.html">
 
 <dom-module id="ajp-container-welcome">
 
@@ -28,33 +28,33 @@
 
 		<swipe-pages threshold="0.30" selected="[[selected]]">
 			<swipe-page style="position: absolute;">
-				<ajp-welcome-page
+				<ajp-welcome
 					current_page="1"
 					total_pages="3"
-					page_background="../images/photos/1.jpg"
+					page_background="../../images/photos/1.jpg"
 					page_description="Make events the hassle-free way. Have the app handle spreading the word out for you."
 					picture_description="Picture of Heather and Rina"
-					picture_taken="Nov 2015"></ajp-welcome-page>
+					picture_taken="Nov 2015"></ajp-welcome>
 			</swipe-page>
 
 			<swipe-page style="position: absolute;">
-				<ajp-welcome-page
+				<ajp-welcome
 					current_page="2"
 					total_pages="3"
-					page_background="../images/photos/2.jpg"
+					page_background="../../images/photos/2.jpg"
 					page_description="Seek out an adventure. Live it up to the fullest. Choose the type of event you want be at."
 					picture_description="Picture of John and William"
-					picture_taken="Jul 2014"></ajp-welcome-page>
+					picture_taken="Jul 2014"></ajp-welcome>
 			</swipe-page>
 
 			<swipe-page>
-				<ajp-welcome-page
+				<ajp-welcome
 					current_page="3"
 					total_pages="3"
-					page_background="../images/photos/3.jpg"
+					page_background="../../images/photos/3.jpg"
 					page_description="Accurately see how popular an event will be with who is currently at and will be at the event."
 					picture_description="Picture of TKE SCSU"
-					picture_taken="Aug 2015"></ajp-welcome-page>
+					picture_taken="Aug 2015"></ajp-welcome>
 			</swipe-page>
 		</swipe-pages>
 

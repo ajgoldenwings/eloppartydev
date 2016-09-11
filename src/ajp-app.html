@@ -193,22 +193,6 @@
 				this.addEventListener('Baasbox',       this._fireAction);
 				this.addEventListener('Main',          this._fireAction);
 
-//this.addEventListener('fireBaasboxSignOff',this._fireAction);//this.addEventListener('fireBaasboxSignOn',this._fireAction);
-				this.addEventListener('fireBaasboxSignUp',            this._fireAction);
-				this.addEventListener('fireHideSnack',                this._fireAction);
-// this.addEventListener('fireClearForms',this._fireAction);
-				this.addEventListener('fireClearPasswordConfirm',     this._fireAction);
-				this.addEventListener('firePasswordChange',           this._fireAction);
-				this.addEventListener('firePasswordCurrentConfirmSet',this._fireAction);
-//this.addEventListener('firePasswordNewReady',this._fireAction);
-//this.addEventListener('firePasswordNewSetToConfirm',  this._fireAction);//this.addEventListener('firePasswordStoreCurrent',this._fireAction);//this.addEventListener('firePasswordTestCurrent',this._fireAction);
-				this.addEventListener('firePopulateUserName',         this._fireAction);
-				//this.addEventListener('fireProgressHide',this._fireAction);//this.addEventListener('fireProgressShow',this._fireAction);
-				this.addEventListener('fireSettings',                 this._fireAction);
-				// this.addEventListener('fireSignOnClear',              this._fireAction);
-				this.addEventListener('fireSignUpClear',              this._fireAction);
-				this.addEventListener('fireShowSnack',                this._fireAction);
-
 				this.baasbox = this.$.baasbox;
 
 				this._populateUserName();
@@ -220,33 +204,17 @@
 					case 'Authentication':this.$.authentication.fire(event.detail.typeFire, event.detail);break;
 					case 'Baasbox':       this.baasbox.fire(         event.detail.typeFire, event.detail);break;
 					case 'Main':          this.$.main.fire(          event.detail.typeFire, event.detail);break;
-
-
-// case 'fireBaasboxSignOff':this.baasbox.signOff();break;// case 'fireBaasboxSignOn':this.baasbox.signOn(event.detail.name, event.detail.password);break;
-					// case 'fireBaasboxSignUp':            this.baasbox.signUp(event.detail.name, event.detail.password);                   break;
-// case 'fireHideSnack':this._hideSnack();break;// case 'fireClearForms':this.$.main.clearForms();break;// case 'fireClearPasswordConfirm':this.$.main.clearPasswordConfirm();break;
-					// case 'firePasswordChange':           this.baasbox.changePassword(event.detail.password, event.detail.passwordCurrent);break;
-					// case 'firePasswordCurrentConfirmSet':this.$.main.$.changepasswordcurrent.setConfirmed(true);                          break;
-// case 'firePasswordNewReady':this._passwordNewReady();break;
-// case 'firePasswordNewSetToConfirm':  this._passwordNewSetToConfirm();break;
-// case 'firePasswordStoreCurrent':this.$.main.passwordStoreCurrent(event.detail.password);break;
-					// case 'firePasswordTestCurrent':      this.baasbox.currentPasswordTest(event.detail.password);                         break;
-					// case 'firePopulateUserName':         this._populateUserName(event.detail.name);                                       break;
-// case 'fireProgressHide':this.$.progress.setAttribute("hidden",true);break;// case 'fireProgressShow':this.$.progress.removeAttribute("hidden");break;// case 'fireSettings':this.set('route.path', '/settings');break;
-					// case 'fireSignOnClear':              this.$.authentication.$.signon.clearSignOn();                                    break;
-					// case 'fireSignUpClear':              this.$.authentication.$.signup.clearSignUp();                                    break;
-// case 'fireShowSnack':this._throwSnack(event.detail.message);break;
 					default:console.error('There was no matching details for the event that was listened by the app.', event);
 				}
 			},
 
 			_fireActionApp: function(type) {
 				switch(type) {
-					case 'hideSnack':   this._hideSnack();                          break;
-					case 'progressHide':this.$.progress.setAttribute("hidden",true);break;
-					case 'progressShow':this.$.progress.removeAttribute("hidden");  break;
-					case 'showSnack':   this._throwSnack(event.detail.message);     break;
-
+					case 'hideSnack':       this._hideSnack();                          break;
+					case 'populateUserName':this._populateUserName(event.detail.name);  break;
+					case 'progressHide':    this.$.progress.setAttribute("hidden",true);break;
+					case 'progressShow':    this.$.progress.removeAttribute("hidden");  break;
+					case 'showSnack':       this._throwSnack(event.detail.message);     break;
 					default:console.error('There was no matching function for the app event.', event);
 				}
 			},
@@ -321,7 +289,7 @@
 					// other routes are lazy loaded
 					} else {
 						this.importHref(
-							this.resolveUrl('ajp-' + page + '.html'),
+							this.resolveUrl('pages/ajp-' + page + '.html'),
 							function() {
 								this._pageLoaded(Boolean(oldPage));
 							}, null, true);

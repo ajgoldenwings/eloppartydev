@@ -18,9 +18,7 @@
 			}
 
 			iron-pages {
-				/*min-height: 100vh;
-				max-width: 1440px;
-				margin: 0 auto;*/
+				/*min-height: 100vh;max-width: 1440px;margin: 0 auto;*/
 
         margin: 0 auto;
         padding: 0 24px 48px 24px;
@@ -68,11 +66,13 @@
 
       ready: function() {
 				this.addEventListener('signOnClear', this._fireAction);
+				this.addEventListener('signUpClear', this._fireAction);
       },
 
 			_fireAction: function(event) {
 				switch(event.type) {
-					case 'signOnClear': this.$.signon.clearSignOn(); break;                                                      break;
+					case 'signOnClear': this.$.signon.clearSignOn(); break;
+					case 'signUpClear': this.$.signup.clearSignUp(); break;
 					default:console.error('There was no matching details for the event that was listened by the authentication container.', event);
 				}
 			}

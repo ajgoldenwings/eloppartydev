@@ -1,10 +1,10 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../bower_components/paper-card/paper-card.html">
-<link rel="import" href="styles/ajp-authentication-styles.html">
-<link rel="import" href="styles/ajp-button.html">
-<link rel="import" href="styles/ajp-common-styles.html">
-<link rel="import" href="styles/ajp-input.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../styles/ajp-authentication-styles.html">
+<link rel="import" href="../styles/ajp-button.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="../styles/ajp-input.html">
 
 <dom-module id="ajp-signon">
 
@@ -107,7 +107,6 @@
 
       _signOn: function() {
 				if (this._validateForm()) {
-					console.log(this.$.accountUsernameSignOn.value, this.$.accountPasswordSignOn.value);
 					this.fire('Baasbox', {typeFire: 'signOn', name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
 				}
       },
