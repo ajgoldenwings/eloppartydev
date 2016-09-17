@@ -3,9 +3,12 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
 
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="ajp-event-generator.html">
+
 <dom-module id="ajp-events">
 
-	<template>
+	<template id="overlay" size="5">
 
 		<style include="ajp-common-styles">
 			h2, h4 {
@@ -21,69 +24,23 @@
 			:host([two-line]) {
 				min-height: 0;
 			}
+
+			body {margin: 0;padding: 0;}
+			.loader {background-color: #0b8043;text-align: center;height: 44px;font: 13px arial;line-height: 44px;color: white;}
+			.scrollState {text-align: center;font: 14px arial;line-height: 30px;}
+			iron-scroll-threshold {	}
 		</style>
 
-		<div role="listbox">
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
+		<h2>Events</h2>
 
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
 
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
+      <iron-scroll-threshold id="scrollThreshold" name="scrollThreshold" lower-threshold="500" on-lower-threshold="loadMoreData" scroll-target="document">
 
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
+        <ajp-event-generator size="[[size]]"></ajp-event-generator>
 
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
+        <div class="loader">Fetching new items...</div>
 
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
-
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
-
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Party Title</div>
-					<div secondary>By: Username</div>
-				</paper-item-body>
-			</paper-item>
-		</div>
-
-		<br>
-
-		<a href="/settings">Settings</a>
+      </iron-scroll-threshold>
 
 	</template>
 
@@ -94,10 +51,22 @@
 			is: 'ajp-events',
 
 			properties: {
+				size: {
+          type: Number,
+          value: 5,
+          notify: true
+				}
 
+			},
+
+			loadMoreData: function(e) {
+				this.size =+ this.size + 5;
+				this.$.scrollThreshold.clearTriggers();
 			}
 
 		});
+
+
 
 	</script>
 

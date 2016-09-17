@@ -1,7 +1,6 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="ajp-baasbox-user-data.html">
 
 <dom-module id="ajp-baasbox">
 
@@ -11,13 +10,6 @@
 	<template>
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
-
-		<iron-localstorage
-				name="ajp-baasbox"
-				value="[[baasbox]]"
-				on-iron-localstorage-load-empty="_initializeBaasbox"></iron-localstorage>
-
-    <ajp-baasbox-user-data id="user" cart="{{user}}"></ajp-baasbox-user-data>
 	</template>
 
 	<script>

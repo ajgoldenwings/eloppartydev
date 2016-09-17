@@ -8,10 +8,12 @@
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<!-- Since 'welcome' is the default route, eagerly load it. -->
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+
 <link rel="import" href="containers/ajp-container-welcome.html">
 <link rel="import" href="containers/ajp-container-main.html">
 <link rel="import" href="containers/ajp-container-authentication.html">
+
 <link rel="import" href="ajp-baasbox.html">
 <link rel="import" href="ajp-toolbar.html">
 
@@ -42,40 +44,6 @@
 
 			[hidden] {
 				display: none !important;
-			}
-
-			#tabContainer {
-				position: relative;
-				height: 66px;
-			}
-
-			ajp-tabs, ajp-tab {
-				--ajp-tab-overlay: {
-					border-bottom: 2px solid var(--app-accent-color);
-				};
-			}
-
-			ajp-tabs {
-				height: 100%;
-			}
-
-			ajp-tab {
-				margin: 0 10px;
-			}
-
-			ajp-tab a {
-				display: inline-block;
-				outline: none;
-				padding: 9px 5px;
-				font-size: 16px;
-				font-weight: 500;
-				text-decoration: none;
-				color: var(--app-primary-color);
-			}
-
-			ajp-welcome-layout {
-				display: block;
-				min-height: 100vh;
 			}
 
 			iron-pages {
@@ -136,12 +104,12 @@
 					type: Object,
 					value: [
 						'action',
-						'events',
-						'user-info',
-						'settings',
 						'change-password-current',
 						'change-password-confirm',
-						'change-password-new'
+						'change-password-new',
+						'events',
+						'user-info',
+						'settings'
 					]
 				},
 
