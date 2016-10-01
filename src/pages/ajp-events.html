@@ -1,46 +1,62 @@
+<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
-<link rel="import" href="../styles/ajp-common-styles.html">
-
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
-<link rel="import" href="ajp-event-generator.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="ajp-events-event.html">
 
 <dom-module id="ajp-events">
 
-	<template id="overlay" size="5">
+	<template id="overlay">
 
 		<style include="ajp-common-styles">
-			h2, h4 {
-				padding: 0 0 6px 16px;
-				margin: 19.95px 0 0 0;
+
+			.loadingIndicator {
+				text-align: center;
+				height: 40px;
 			}
 
-			.paper-item-link {
-				color: inherit;
-				text-decoration: none;
+			.loadingIndicator paper-spinner {
+				width: 20px;
+				height: 20px;
+				margin-right: 10px;
 			}
 
-			:host([two-line]) {
-				min-height: 0;
+			h2.pageHeader {
+				-webkit-margin-after: 0px;
 			}
 
-			body {margin: 0;padding: 0;}
-			.loader {background-color: #0b8043;text-align: center;height: 44px;font: 13px arial;line-height: 44px;color: white;}
-			.scrollState {text-align: center;font: 14px arial;line-height: 30px;}
-			iron-scroll-threshold {	}
+			iron-list {
+				padding-bottom: 16px;
+				--iron-list-items-container: {
+					max-width: 800px;
+					margin: auto;
+					margin-bottom: 10px;
+				};
+			}
+
 		</style>
 
-		<h2>Events</h2>
+		<h2 class="pageHeader">Events</h2>
 
+    <iron-list id="list" items="[]" as="event" scroll-target="document">
+      <template>
+        <div>
+					<ajp-events-event event=[[event]]></ajp-events-event>
+        </div>
+      </template>
+    </iron-list>
 
-      <iron-scroll-threshold id="scrollThreshold" name="scrollThreshold" lower-threshold="500" on-lower-threshold="loadMoreData" scroll-target="document">
+    <div class="loadingIndicator">
+      <paper-spinner active="{{loadingEvents}}"></paper-spinner>
+    </div>
 
-        <ajp-event-generator size="[[size]]"></ajp-event-generator>
-
-        <div class="loader">Fetching new items...</div>
-
-      </iron-scroll-threshold>
+		<iron-scroll-threshold id="scrollTheshold"
+      lower-threshold="500"
+      on-lower-threshold="_loadMoreData"
+      scroll-target="document">
+    </iron-scroll-threshold>
 
 	</template>
 
@@ -51,22 +67,52 @@
 			is: 'ajp-events',
 
 			properties: {
-				size: {
+				page: {
           type: Number,
-          value: 5,
+          value: 0,
           notify: true
-				}
+				},
 
+				loadingEvents: {
+					type: Boolean,
+					value: false,
+					notify: true
+				},
+
+				firstTimeEventsLoaded: {
+					type: Boolean,
+					value: true
+				}
 			},
 
-			loadMoreData: function(e) {
-				this.size =+ this.size + 5;
-				this.$.scrollThreshold.clearTriggers();
+			eventsPopulate: function(events,isEnd) {
+				var time = 0;
+				if (this.firstTimeEventsLoaded) {
+					// This fixes speedy page loads and events will overlap each other due to page not setting transform: translate3d correctly.
+					// This will slow it down on the first page load. This is a temporary fix.
+					// Hopefully there will be a fix for this or more resources on why this is happening.
+					time = 1500;
+					this.firstTimeEventsLoaded = false;
+				}
+				var thisFunc = this;
+				setTimeout(function(){
+					events.forEach(function(event) {
+						thisFunc.$.list.push('items', event);
+					});
+					thisFunc.loadingEvents = false;
+					if (!isEnd) {
+						thisFunc.$.scrollTheshold.clearTriggers();
+					}
+				}, time);
+			},
+
+			_loadMoreData: function(e) {
+				this.loadingEvents = true;
+				this.fire('Baasbox', {typeFire: 'eventsLoad', page: this.page});
+				this.page++;
 			}
 
 		});
-
-
 
 	</script>
 

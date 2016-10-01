@@ -8,7 +8,7 @@
 	<template>
 
 		<style include="ajp-common-styles">
-			h2, h4 {
+			h4 {
 				padding: 0 0 6px 16px;
 				margin: 19.95px 0 0 0;
 			}
@@ -23,7 +23,7 @@
 			}
 		</style>
 
-		<h2>Settings</h2>
+		<h2 class="pageHeader">Settings</h2>
 
 		<h4 class="border-bottom">My Account</h4>
 
@@ -32,6 +32,12 @@
 				<paper-item-body two-line>
 					<div>Username</div>
 					<div secondary>[[userName]]</div>
+				</paper-item-body>
+			</paper-item>
+			<paper-item class="border-bottom disabled">
+				<paper-item-body two-line>
+					<div style="color:lightgrey;">Favorite Color</div>
+					<div secondary style="color:lightgrey;">Represent Your Style With Your Favorite Color</div>
 				</paper-item-body>
 			</paper-item>
 			<a class="paper-item-link" href="/change-password-current" tabindex="-1">
