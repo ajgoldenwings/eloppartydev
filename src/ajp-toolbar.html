@@ -35,7 +35,7 @@
 			.logo a {
 				font-size: 25px;
 				font-weight: 600;
-				letter-spacing: 0.2em;
+				letter-spacing: 0.1em;
 				color: var(--app-primary-color);
 				text-decoration: none;
 				/* required for IE 11, so this <a> can receive pointer events */
@@ -55,6 +55,7 @@
 				display: none;
 			}
 
+			:host([page=add-event]) .back-btn,
 			:host([page=settings]) .back-btn  {
 				display: flex;
 			}
@@ -65,6 +66,7 @@
 				display: flex;
 			}
 
+			:host([page=add-event]) .logo,
 			:host([page=settings]) .logo,
 			:host([page=change-password-confirm]) .logo,
 			:host([page=change-password-current]) .logo,

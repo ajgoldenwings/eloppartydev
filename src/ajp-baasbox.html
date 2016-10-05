@@ -53,6 +53,7 @@
 				})
 				.fail(function(error) {
 					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Failed to load events.'});
+					thisFunc.fire('Main', {typeFire: 'turnOffLoadingEvents'});
 				});
 			},
 

@@ -1,0 +1,183 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../styles/ajp-form-styles.html">
+<link rel="import" href="../styles/ajp-button.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="../styles/ajp-input.html">
+<link rel="import" href="../styles/ajp-select.html">
+<link rel="import" href="../styles/paper-dropdown-menu-styles.html">
+
+<dom-module id="ajp-add-event">
+
+	<template>
+
+		<style include="ajp-form-styles ajp-button ajp-common-styles ajp-input ajp-select paper-dropdown-menu-styles">
+
+		</style>
+
+		<form
+			id="addEventForm"
+			is="iron-form"
+			method="post"
+		>
+
+			<div class="container flex-horizontal-with-ratios">
+				<div class="flexchild"></div>
+				<div class="flex3child">
+					<h2>Add Event</h2>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-input>
+								<input type="title" id="eventTitle" name="eventTitle"
+										placeholder="Event Title" required
+										aria-labelledby="eventTitleLabel">
+								<ajp-md-decorator error-message="Invalid Title" aria-hidden="true">
+									<label id="eventTitleLabel">Event Title</label>
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-input>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<!--<label for="startTime">Start Time</label>
+							<ajp-select>
+								<select id="startTime" name="startTime" required
+											placeholder="Start Time" aria-label="Start Time">
+									<option value="1400">2:00 PM</option>
+									<option value="1430">2:30 PM</option>
+									<option value="1500">3:00 PM</option>
+									<option value="1530">3:30 PM</option>
+								</select>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-select>-->
+
+							<paper-dropdown-menu label="Start Time">
+								<paper-listbox class="dropdown-content">
+									<paper-item>2:00 PM</paper-item>
+									<paper-item>2:30 PM</paper-item>
+									<paper-item>3:00 PM</paper-item>
+									<paper-item>3:30 PM</paper-item>
+								</paper-listbox>
+							</paper-dropdown-menu>
+						</div>
+						<div class="column">
+							<!--<ajp-select>
+								<select id="eventLength" name="eventLength" required
+										placeholder="Event Length" aria-label="Event Length">
+									<option value="60">1 hour</option>
+									<option value="90">1 1/2 hours</option>
+									<option value="120">2 hours</option>
+									<option value="150">2 1/2 hours</option>
+									<option value="180">3 hours</option>
+									<option value="210">3 1/2 hours</option>
+									<option value="240">4 hours</option>
+									<option value="270">4 1/2 hours</option>
+									<option value="300">5 hours</option>
+									<option value="330">5 1/2 hours</option>
+									<option value="360">6 hours</option>
+								</select>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-select>-->
+
+							<paper-dropdown-menu label="Start Time">
+								<paper-listbox class="dropdown-content">
+									<paper-item>1 hour</paper-item>
+									<paper-item> 1/2 hours</paper-item>
+									<paper-item>2 hours</paper-item>
+									<paper-item>2 1/2 hours</paper-item>
+									<paper-item>3 hours</paper-item>
+									<paper-item>3 1/2 hours</paper-item>
+									<paper-item>4 hours</paper-item>
+									<paper-item>4 1/2 hours</paper-item>
+									<paper-item>5 hours</paper-item>
+									<paper-item>5 1/2 hours</paper-item>
+									<paper-item>6 hours</paper-item>
+								</paper-listbox>
+							</paper-dropdown-menu>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-button responsive on-click="_add">
+								<a>Add</a>
+							</ajp-button>
+						</div>
+					</div>
+				</div>
+				<div class="flexchild"></div>
+			</div>
+
+		</form>
+
+
+
+
+
+
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-add-event',
+
+			properties: {
+
+			},
+
+			_add: function() {
+				if (this._validateForm()) {
+					alert('Form Valid');
+				}
+      },
+
+      _validateForm: function() {
+        var form = this.$.addEventForm, firstInvalid = false;
+
+        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+          if (el.checkValidity()) {
+            el.removeAttribute('aria-invalid');
+          } else {
+            if (!firstInvalid) {
+              // announce error message
+              if (el.nextElementSibling) {
+                this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+              }
+              if (el.scrollIntoViewIfNeeded) {
+                // safari, chrome
+                el.scrollIntoViewIfNeeded();
+              } else {
+                // firefox, edge, ie
+                el.scrollIntoView(false);
+              }
+              el.focus();
+              firstInvalid = true;
+            }
+            el.setAttribute('aria-invalid', 'true');
+          }
+        }
+
+				if (firstInvalid) {
+					this.fire('fireShowSnack', {message: 'Please fill out the event form.'});
+				}
+
+        return !firstInvalid;
+      }
+
+		});
+
+	</script>
+
+</dom-module>

@@ -1,15 +1,13 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<!--<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">-->
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
-<!--<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">-->
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
 <link rel="import" href="../ajp-icons.html">
 
-<dom-module id="ajp-events-event">
+<dom-module id="ajp-list-event">
 
 	<template>
 
@@ -58,7 +56,6 @@
 
 			.eventItemContent .eventItemTitle {
 				font-size: 1.47em;
-				-webkit-padding-before: 0.23em;
 				-webkit-padding-start: 0.23em;
 				-webkit-padding-end: 0.23em;
 				font-weight: bold;
@@ -79,10 +76,15 @@
 				background:rgba(255,255,255,0.75);
 			}
 
-			.eventItemContent .eventItemDetailsEvent,
+			.eventItemContent .eventItemDetailsEvent {
+				font-size: 0.68em;
+				display: flex;
+  			flex-direction: column;
+			}
+
 			.eventItemContent .eventItemDetailsPromoter {
-				display: inline-block;
 				font-size: 0.85em;
+				display: inline-block;
 			}
 
 			.eventItemContent .eventItemDetailsPromoter .eventItemAuthor {
@@ -101,6 +103,10 @@
 
 			.flexchild {
 				@apply(--layout-flex);
+			}
+
+			.notCompleted {
+				color: lightgrey;
 			}
 
 			.topMargin {
@@ -135,26 +141,29 @@
 					<div class="eventItemDetailsPromoter ">
 						<div class="eventItemAuthor">[[event._author]]</div>
 						<div class="eventItemStarPower" id="starPower">
-							<div class="score inline">1,000</div><paper-icon-button icon="star" aria-label="Go back"></paper-icon-button>
+							<!--<div class="score inline notCompleted">1,000</div><paper-icon-button icon="star" aria-label="Go back"></paper-icon-button>-->
 						</div>
-						<paper-tooltip for="starPower">Star Power</paper-tooltip>
+						<paper-tooltip for="starPower" offset="0">Star Power</paper-tooltip>
 					</div>
 					<div class="flexchild"></div>
-					<div class="eventItemDetailsEvent ">
-						<div class="inline">[[_formatDateTime(event.date)]]</div> to
-						<div class="inline">[[_formatDateTime(event.date_end)]]</div>
-						<div class="inline">([[_formatLength(event.length)]])</div>
+					<div class="eventItemDetailsEvent">
+						<div style="margin-top: auto;">
+							<div class="inline">[[_formatDateTime(event.date)]]</div>
+							<div class="inline">to</div>
+							<div class="inline">[[_formatDateTime(event.date_end)]]</div>
+							<div class="inline">([[_formatLength(event.length)]])</div>
+						</div>
 					</div>
 				</div>
-				<div class="eventItemActions flex-horizontal bottom">
+				<div class="eventItemActions flex-horizontal bottom notCompleted">
 					<div>
-						More Info
-						<iron-icon icon="icons:account-box"></iron-icon>
+						<!--More Info
+						<iron-icon icon="icons:account-box"></iron-icon>-->
 					</div>
 					<div class="flexchild"></div>
 					<div>
-						<iron-icon icon="communication:location-on"></iron-icon>
-						<span>250ft</span>
+						<!--<iron-icon icon="communication:location-on"></iron-icon>
+						<span>250ft</span>-->
 					</div>
 				</div>
 			</div>
@@ -166,7 +175,7 @@
 
 		Polymer({
 
-			is: 'ajp-events-event',
+			is: 'ajp-list-event',
 
 			properties: {
 				event: {
@@ -178,10 +187,6 @@
 					type: String,
 					value: 'https://placeimg.com/640/480/people'
 				}
-			},
-
-			ready: function() {
-				console.log('ready');
 			},
 
 			_formatDateTime: function(date) {

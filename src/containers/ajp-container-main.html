@@ -40,6 +40,7 @@
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+			<ajp-add-event name="add-event"></ajp-add-event>
 			<ajp-action name="action"></ajp-action>
 			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"></ajp-change-password-current>
 			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"></ajp-change-password-confirm>
@@ -91,6 +92,7 @@
 				this.addEventListener('passwordReady',            this._fireAction);
 				this.addEventListener('passwordNewSetToConfirm',  this._fireAction);
 				this.addEventListener('passwordStoreCurrent',     this._fireAction);
+				this.addEventListener('turnOffLoadingEvents',     this._fireAction);
       },
 
 			_fireAction: function(event) {
@@ -103,6 +105,7 @@
 					case 'passwordReady':            this._passwordReady();                                               break;
 					case 'passwordNewSetToConfirm':  this._passwordNewSetToConfirm(event.detail.password);                break;
 					case 'passwordStoreCurrent':     this.passwordStoreCurrent(event.detail.password);                    break;
+					case 'turnOffLoadingEvents':     this.$.events.turnOffLoadingEvents();                                break;
 					default:console.error('There was no matching details for the event that was listened by the main container.', event);
 				}
 			},
