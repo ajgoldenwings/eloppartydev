@@ -1,0 +1,210 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../styles/ajp-form-styles.html">
+<link rel="import" href="../styles/ajp-button.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="../styles/ajp-input.html">
+<link rel="import" href="../styles/ajp-select.html">
+<link rel="import" href="../styles/paper-dropdown-menu-styles.html">
+
+<dom-module id="ajp-event-add">
+
+	<template>
+
+		<style include="ajp-form-styles ajp-button ajp-common-styles ajp-input ajp-select paper-dropdown-menu-styles">
+
+		</style>
+
+		<form
+			id="addEventForm"
+			is="iron-form"
+			method="post"
+		>
+
+			<div class="container flex-horizontal-with-ratios">
+				<div class="flexchild"></div>
+				<div class="flex3child">
+					<h2>Add Event</h2>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-input>
+								<input type="title" id="eventTitle" name="eventTitle"
+										placeholder="Event Title" required
+										aria-labelledby="eventTitleLabel">
+								<ajp-md-decorator error-message="Invalid Title" aria-hidden="true">
+									<label id="eventTitleLabel">Event Title</label>
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-input>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<br>
+							<br>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<label for="startTime">Start Time</label>
+							<ajp-select>
+								<select id="startTime" name="startTime" required
+									placeholder="Start Time" aria-label="Start Time">
+
+								</select>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-select>
+						</div>
+						<div class="column">
+							<label for="eventLength">Event Length</label>
+							<ajp-select>
+								<select id="eventLength" name="eventLength" required
+									placeholder="Event Length" aria-label="Event Length">
+									<option value="60">1 hour</option>
+									<option value="90">1&frac12; hours</option>
+									<option value="120">2&nbsp;hours</option>
+									<option value="150">2&frac12; hours</option>
+									<option value="180">3&nbsp;hours</option>
+									<option value="210">3&frac12; hours</option>
+									<option value="240">4&nbsp;hours</option>
+									<option value="270">4&frac12; hours</option>
+									<option value="300">5&nbsp;hours</option>
+								</select>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-select>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<br>
+							<br>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-button responsive on-click="_add">
+								<a>Add</a>
+							</ajp-button>
+						</div>
+					</div>
+				</div>
+				<div class="flexchild"></div>
+			</div>
+
+		</form>
+
+
+	</template>
+
+	<script>
+
+		Polymer({
+
+			is: 'ajp-event-add',
+
+			properties: {
+
+			},
+
+			clearForm: function() {
+				this.$.eventTitle.value = '';
+			},
+
+			ready: function() {
+				this._generateTimes();
+			},
+
+			_generateTimes: function() {
+				var ap = ['AM', 'PM']; // AM-PM
+				var currentDate = new Date();
+				var currentDateMinutes = currentDate.getMinutes()-currentDate.getMinutes()%30;
+				var currentDateHours = currentDate.getHours();
+				var interval = 30; //minutes interval
+				var times = []; // time array
+				var tt = currentDateMinutes+currentDateHours*60; // start time
+				var startDate = currentDate;
+				startDate.setHours(0,tt,0,0);
+				//loop to increment the time and push results in array
+				for (var i=0;tt-(currentDateMinutes+currentDateHours*60)<12*60; i++) {
+					var hh = Math.floor(tt/60); // getting hours of day in 0-24 format
+					var mm = (tt%60); // getting minutes of the hour in 0-55 format
+					var option = document.createElement('option');
+					option.value = startDate;
+					option.innerHTML = ("0" + (hh%12==0?12:(hh % 12))).slice(-2) + ':' + ("0" + mm).slice(-2) + ap[Math.floor(hh/12)%2];
+					this.$.startTime.appendChild(option);
+					tt += interval;
+					startDate = currentDate;
+					startDate.setHours(0,tt,0,0);
+				}
+      },
+
+			_add: function() {
+				if (this._validateForm()) {
+					this.fire('Baasbox', {typeFire: 'eventAdd', title: this.$.eventTitle.value, startTime: this.$.startTime.value, length: this.$.eventLength.value});
+				}
+      },
+
+      _validateForm: function() {
+        var form = this.$.addEventForm, firstInvalid = false;
+				var currentDate = new Date();
+				var startDate = new Date(this.$.startTime.value);
+				var endDate = startDate;
+				endDate.setMinutes(endDate.getMinutes() + parseInt(this.$.eventLength.value));
+
+				if (endDate <= currentDate) {
+					firstInvalid = true;
+				}
+
+				if (firstInvalid) {
+					this.fire('App', {typeFire: 'showSnack', message: 'The times selected for the event has already happened. Refresh page.'});
+				}
+
+				if (!firstInvalid) {
+					for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+						if (el.checkValidity()) {
+							el.removeAttribute('aria-invalid');
+						} else {
+							if (!firstInvalid) {
+								// announce error message
+								if (el.nextElementSibling) {
+									this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+								}
+								if (el.scrollIntoViewIfNeeded) {
+									// safari, chrome
+									el.scrollIntoViewIfNeeded();
+								} else {
+									// firefox, edge, ie
+									el.scrollIntoView(false);
+								}
+								el.focus();
+								firstInvalid = true;
+							}
+							el.setAttribute('aria-invalid', 'true');
+						}
+					}
+
+					if (firstInvalid) {
+						this.fire('App', {typeFire: 'showSnack', message: 'Please fill out the event form.'});
+					}
+				}
+
+        return !firstInvalid;
+      }
+
+		});
+
+	</script>
+
+</dom-module>

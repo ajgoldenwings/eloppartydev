@@ -34,7 +34,7 @@
 
 		</style>
 
-		<h2 class="pageHeader">Event List</h2>
+		<h2>Event List</h2>
 
     <iron-list id="list" items="[]" as="event" scroll-target="document">
       <template>
@@ -87,19 +87,27 @@
 					// This fixes speedy page loads and events will overlap each other due to page not setting transform: translate3d correctly.
 					// This will slow it down on the first page load. This is a temporary fix.
 					// Hopefully there will be a fix for this or more resources on why this is happening.
-					time = 1500;
+					time = 1300;
 					this.firstTimeEventsLoaded = false;
 				}
 				var thisFunc = this;
 				setTimeout(function(){
 					events.forEach(function(event) {
-						thisFunc.$.list.push('items', event);
+						thisFunc.pushEvent(event);
 					});
 					thisFunc.turnOffLoadingEvents();
 					if (!isEnd) {
 						thisFunc.$.scrollTheshold.clearTriggers();
 					}
 				}, time);
+			},
+
+			pushEvent(event) {
+				this.$.list.push('items', event);
+			},
+
+			unshiftEvent(event) {
+				this.$.list.unshift('items', event);
 			},
 
 			turnOffLoadingEvents: function() {
