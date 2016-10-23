@@ -214,13 +214,13 @@
 			_getIronPageValue: function(page) {
 				// TODO: Make 404 page
 				var currentUser = this.$.baasbox.getCurrentUser();
-				if (this._isUserDefined(currentUser) && this._isInRegisteredUserPages(page)) {
-					page = page || 'events';
-				} else if (!this._isUserDefined(currentUser) && this._isInUnregisteredUserPages(page)) {
+				if (this._isUserDefined(currentUser) && (page == "" || !this._isInRegisteredUserPages(page))) {
+					page = 'events';
+				} else if (!this._isUserDefined(currentUser) && (page == "" || !this._isInUnregisteredUserPages(page))) {
 					if (this.appStorage.welcomed) {
-						page = page || 'signon';
+						page = 'signon';
 					} else {
-						this.appStorage.welcomed = true;
+      			this.set('appStorage.welcomed', true);
 						page = 'welcome';
 					}
 				}
