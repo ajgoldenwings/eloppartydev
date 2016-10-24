@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
 <link rel="import" href="../components/ajp-list-event.html">
@@ -27,13 +29,37 @@
 			iron-list {
 				padding-bottom: 16px;
 				--iron-list-items-container: {
-					max-width: 800px;
 					margin: auto;
 					margin-bottom: 10px;
 				};
 			}
 
 		</style>
+
+		<h2>Notifications</h2>
+
+		<div role="listbox">
+			<paper-item class="border-bottom">
+				<paper-item-body two-line>
+					<div>Allow access to the Camera</div>
+					<div secondary>Allow Access to take pictures of events.</div>
+				</paper-item-body>
+			</paper-item>
+			<paper-item class="border-bottom">
+				<paper-item-body two-line>
+					<div>Allow access to the GPS</div>
+					<div secondary>Allow Access to get the location of the events.</div>
+				</paper-item-body>
+			</paper-item>
+		</div>
+
+    <iron-list>
+      <template>
+        <div>
+					<span></span>
+        </div>
+      </template>
+    </iron-list>
 
 		<h2>Event List</h2>
 
