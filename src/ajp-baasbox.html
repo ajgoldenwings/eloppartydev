@@ -26,6 +26,7 @@
 				this._setEndPoint("https://baasbox.elopparty.com");
 				this._setAppCode("1234567890");
 
+				this.addEventListener('eventAdd',           this._fireAction);
 				this.addEventListener('eventsLoad',         this._fireAction);
 				this.addEventListener('passwordChange',     this._fireAction);
 				this.addEventListener('passwordTestCurrent',this._fireAction);
@@ -36,6 +37,7 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
+					case 'eventAdd':           this.eventAdd(event.detail.title,event.detail.startTime,event.detail.length);break;
 					case 'eventsLoad':         this.eventsLoad(event.detail.page);                                     break;
 					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);break;
 					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                             break;
@@ -46,9 +48,31 @@
 				}
 			},
 
+			eventAdd: function(title,startTime,length) {
+				this.fire('App', {typeFire: 'progressShow'});
+				var elop_event = new Object();
+				var thisFunc = this;
+				elop_event.title = title;
+				elop_event.date = startTime;
+				elop_event.length = length;
+				BaasBox.save(elop_event, "elop_events")
+					.done(function(res) {
+						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Your event was added.'});
+						thisFunc.fire('App', {typeFire: 'progressHide'});
+						thisFunc.fire('Main', {typeFire: 'unshiftEvent', event: res});
+						thisFunc.set('route.path', '/');
+					})
+					.fail(function(error) {
+					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Failed to add event.'});
+						thisFunc.fire('App', {typeFire: 'progressHide'});
+						thisFunc.set('route.path', '/');
+					})
+
+			},
+
 			eventsLoad: function(page) {
 				var thisFunc = this;
-				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5}).done(function(res) {
+				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5, orderBy: "_creation_date DESC"}).done(function(res) {
 					thisFunc.fire('Main', {typeFire: 'eventsPopulate', events: res, isEnd: res.length==0});
 				})
 				.fail(function(error) {

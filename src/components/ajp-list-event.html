@@ -27,7 +27,7 @@
 				@apply(--layout-horizontal);
 				min-width: 100%;
 				height: auto;
-				margin: 16px 0 0 0;
+				margin: 0 0 32px 0;
 				background-color: white;
 			}
 
@@ -55,10 +55,10 @@
 			}
 
 			.eventItemContent .eventItemTitle {
-				font-size: 1.47em;
+				font-size: 1.37em;
 				-webkit-padding-start: 0.23em;
 				-webkit-padding-end: 0.23em;
-				font-weight: bold;
+				font-weight: normal;
 				width: auto;
 			}
 
@@ -150,15 +150,14 @@
 						<div style="margin-top: auto;">
 							<div class="inline">[[_formatDateTime(event.date)]]</div>
 							<div class="inline">to</div>
-							<div class="inline">[[_formatDateTime(event.date_end)]]</div>
+							<div class="inline">[[_formatDateTime(event.date,event.length)]]</div>
 							<div class="inline">([[_formatLength(event.length)]])</div>
 						</div>
 					</div>
 				</div>
-				<div class="eventItemActions flex-horizontal bottom notCompleted">
+				<div class="eventItemActions flex-horizontal bottom">
 					<div>
-						<!--More Info
-						<iron-icon icon="icons:account-box"></iron-icon>-->
+						<iron-icon icon="account-box"></iron-icon>
 					</div>
 					<div class="flexchild"></div>
 					<div>
@@ -189,19 +188,30 @@
 				}
 			},
 
-			_formatDateTime: function(date) {
-				var dateTime = new Date(date);
-				var hoursPart = dateTime.getHours()%12;
-				if (hoursPart == 0) hoursPart = 12;
-				var minutePart = ('0'+dateTime.getMinutes()).slice(-2);
-				var midday = (dateTime.getHours()<12?'AM':'PM');
-				return hoursPart+':'+minutePart+midday;
+			_formatDateTime: function(date,minutes) {
+				var formatString = '';
+				if (date !== undefined) {
+					var dateTime = new Date(date);
+					if (minutes !== undefined) {
+						dateTime.setMinutes(dateTime.getMinutes() + parseInt(minutes));
+					}
+					var hoursPart = dateTime.getHours()%12;
+					if (hoursPart == 0) hoursPart = 12;
+					var minutePart = ('0'+dateTime.getMinutes()).slice(-2);
+					var midday = (dateTime.getHours()<12?'AM':'PM');
+					formatString = hoursPart+':'+minutePart+midday;
+				}
+				return formatString;
 			},
 
 			_formatLength: function(minutes) {
-				var length_in_hours = minutes/60;
-				var length_text = length_in_hours == 1 ? ' hour' : ' hours';
-				return length_in_hours + ' ' + length_text;
+				var formatString = '';
+				if (minutes !== undefined) {
+					var length_in_hours = minutes/60;
+					var length_text = length_in_hours == 1 ? ' hour' : ' hours';
+					formatString = length_in_hours + ' ' + length_text;
+				}
+				return formatString;
 			},
 
 		});

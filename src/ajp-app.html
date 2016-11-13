@@ -6,6 +6,7 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
@@ -62,10 +63,13 @@
 
 		</style>
 
+		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
+		<iron-localstorage name="ajp-app-storage" value="{{appStorage}}" on-iron-localstorage-load-empty="initializeDefaultAppStorage"></iron-localstorage>
+
+
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
 			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-container-main>
@@ -104,10 +108,10 @@
 					type: Object,
 					value: [
 						'action',
-						'add-event',
 						'change-password-current',
 						'change-password-confirm',
 						'change-password-new',
+						'event-add',
 						'events',
 						'user-info',
 						'settings'
@@ -127,9 +131,14 @@
 
 				getLayout: {
 					type: String
+				},
+
+				appStorage: {
+					type: Object
 				}
 
 			},
+
 
 			observers: [
 				'_routePageChanged(routeData.page)'
@@ -145,6 +154,12 @@
 				window.performance && performance.mark && performance.mark('ajp-app.created');
 				// Custom elements polyfill safe way to indicate an element has been upgraded.
 				this.removeAttribute('unresolved');
+			},
+
+			initializeDefaultAppStorage: function(ev) {
+				this.appStorage = {
+					welcomed: false
+				}
 			},
 
 			ready: function() {
@@ -200,13 +215,17 @@
 			_getIronPageValue: function(page) {
 				// TODO: Make 404 page
 				var currentUser = this.$.baasbox.getCurrentUser();
-				if (this._isUserDefined(currentUser) && this._isInRegisteredUserPages(page)) {
-					this.set('route.path', '/');
+				if (this._isUserDefined(currentUser) && (page == "" || !this._isInRegisteredUserPages(page))) {
 					page = 'events';
-				} else if (!this._isUserDefined(currentUser) && this._isInUnregisteredUserPages(page)) {
-					this.set('route.path', '/signon');
-					page = 'signon';
+				} else if (!this._isUserDefined(currentUser) && (page == "" || !this._isInUnregisteredUserPages(page))) {
+					if (this.appStorage.welcomed) {
+						page = 'signon';
+					} else {
+      			this.set('appStorage.welcomed', true);
+						page = 'welcome';
+					}
 				}
+				this.set('route.path', '/'+page);
 				return page || 'welcome';
 			},
 
@@ -215,11 +234,11 @@
 			},
 
 			_isInRegisteredUserPages: function(page) {
-				return this.registeredUserPages.indexOf(page) == -1;
+				return this.registeredUserPages.indexOf(page) != -1;
 			},
 
 			_isInUnregisteredUserPages: function(page) {
-				return this.unregisteredUserPages.indexOf(page) == -1;
+				return this.unregisteredUserPages.indexOf(page) != -1;
 			},
 
 			_isUserDefined: function(currentUser) {
@@ -239,13 +258,16 @@
 			},
 
 			_routePageChanged: function(page) {
-				this.page = this._getIronPageValue(page);
-				this.getLayout = this._getLayoutValue(this.page);
-				// Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
-				// with `behavior: 'silent'` to disable header scroll effects during the scroll.
-				Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
-				// Close the drawer - in case the *route* change came from a link in the drawer.
-				// this.drawerOpened = false;
+        // access sibling or parent elements here
+				this.async(function() {
+					this.page = this._getIronPageValue(page);
+					this.getLayout = this._getLayoutValue(this.page);
+					// Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
+					// with `behavior: 'silent'` to disable header scroll effects during the scroll.
+					Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+					// Close the drawer - in case the *route* change came from a link in the drawer.
+					// this.drawerOpened = false;
+				});
 			},
 
 			_pageChanged: function(page, oldPage) {

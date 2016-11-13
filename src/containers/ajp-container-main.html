@@ -18,8 +18,13 @@
 				/*min-height: 100vh;max-width: 1440px;*/
 				margin: 0 auto;
 				padding: 0 15px 28px 15px;
+<<<<<<< HEAD
 				max-width: 900px;
 				overflow: hidden;
+=======
+        max-width: 900px;
+        /*overflow: hidden;*/
+>>>>>>> origin/master
 			}
 
 			/* small screen */
@@ -39,7 +44,7 @@
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-add-event name="add-event"></ajp-add-event>
+			<ajp-event-add name="event-add"></ajp-event-add>
 			<ajp-action name="action"></ajp-action>
 			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"></ajp-change-password-current>
 			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"></ajp-change-password-confirm>
@@ -86,12 +91,14 @@
 				this.addEventListener('clearForms',               this._fireAction);
 				this.addEventListener('clearPasswordConfirm',     this._fireAction);
 				this.addEventListener('eventsPopulate',           this._fireAction);
+				this.addEventListener('eventsAdd',                this._fireAction);
 				this.addEventListener('passwordChangeValidate',   this._fireAction);
 				this.addEventListener('passwordCurrentConfirmSet',this._fireAction);
 				this.addEventListener('passwordReady',            this._fireAction);
 				this.addEventListener('passwordNewSetToConfirm',  this._fireAction);
 				this.addEventListener('passwordStoreCurrent',     this._fireAction);
 				this.addEventListener('turnOffLoadingEvents',     this._fireAction);
+				this.addEventListener('unshiftEvent',             this._fireAction);
 			},
 
 			_fireAction: function(event) {
@@ -105,6 +112,7 @@
 					case 'passwordNewSetToConfirm':  this._passwordNewSetToConfirm(event.detail.password);                break;
 					case 'passwordStoreCurrent':     this.passwordStoreCurrent(event.detail.password);                    break;
 					case 'turnOffLoadingEvents':     this.$.events.turnOffLoadingEvents();                                break;
+					case 'unshiftEvent':             this.$.events.unshiftEvent(event.detail.event);                      break;
 					default:console.error('There was no matching details for the event that was listened by the main container.', event);
 				}
 			},
