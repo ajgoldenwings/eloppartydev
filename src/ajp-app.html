@@ -52,7 +52,7 @@
 			}
 
 			paper-progress {
-    		--paper-progress-active-color: var(--app-primary-color);
+				--paper-progress-active-color: var(--app-primary-color);
 				--paper-progress-container-color: white;
 				bottom: 0;
 				position: fixed;
@@ -176,11 +176,12 @@
 
 			_fireActionApp: function(type) {
 				switch(type) {
-					case 'hideSnack':       this._hideSnack();                          break;
-					case 'populateUserName':this._populateUserName(event.detail.name);  break;
-					case 'progressHide':    this.$.progress.setAttribute("hidden",true);break;
-					case 'progressShow':    this.$.progress.removeAttribute("hidden");  break;
-					case 'showSnack':       this._throwSnack(event.detail.message);     break;
+					case 'hideSnack':       this._hideSnack();                            break;
+					case 'populateUserName':this._populateUserName(event.detail.name);    break;
+					case 'progressHide':    this.$.progress.setAttribute("hidden",true);  break;
+					case 'progressShow':    this.$.progress.removeAttribute("hidden");    break;
+					case 'setPage':         this.set('route.path', '/'+event.detail.page);break;
+					case 'showSnack':       this._throwSnack(event.detail.message);       break;
 					default:console.error('There was no matching function for the app event.', event);
 				}
 			},

@@ -16,11 +16,10 @@
 
 			iron-pages {
 				/*min-height: 100vh;max-width: 1440px;*/
-
-        margin: 0 auto;
+				margin: 0 auto;
 				padding: 0 15px 28px 15px;
-        max-width: 900px;
-        overflow: hidden;
+				max-width: 900px;
+				overflow: hidden;
 			}
 
 			/* small screen */
@@ -83,7 +82,7 @@
 
 			},
 
-      ready: function() {
+			ready: function() {
 				this.addEventListener('clearForms',               this._fireAction);
 				this.addEventListener('clearPasswordConfirm',     this._fireAction);
 				this.addEventListener('eventsPopulate',           this._fireAction);
@@ -93,7 +92,7 @@
 				this.addEventListener('passwordNewSetToConfirm',  this._fireAction);
 				this.addEventListener('passwordStoreCurrent',     this._fireAction);
 				this.addEventListener('turnOffLoadingEvents',     this._fireAction);
-      },
+			},
 
 			_fireAction: function(event) {
 				switch(event.type) {
@@ -120,7 +119,6 @@
 				if (this.$.changepasswordnew.createdCallback !== undefined) {
 					this.$.changepasswordnew.clearForm();
 				}
-
 				this.tempPasswordCurrent = '';
 				this.tempPasswordNew = '';
 			},
@@ -137,7 +135,26 @@
 
 			_passwordChangeValidate: function(password) {
 				if (password == this.tempPasswordNew) {
-					this.fire('Baasbox', {typeFire: 'passwordChange', passwordCurrent: this.tempPasswordCurrent, password: password});
+					var that = this;
+					var callbackFail = function() {
+						that.fire('Main', {typeFire: 'clearForms'});
+						that.fire('Main', {typeFire: 'clearPasswordConfirm'});
+						that.fire('App', {typeFire: 'setPage', page: 'settings'});
+						that.fire('App', {typeFire: 'showSnack', message: 'Something went wrong when changing your password.'});
+						that.fire('App', {typeFire: 'progressHide'});
+					};
+					var callbackSuccess = function() {
+						that.fire('Main', {typeFire: 'clearPasswordConfirm'});
+						var callback = function() {
+							that.fire('Main', {typeFire: 'clearForms'});
+							that.fire('App', {typeFire: 'setPage', page: 'settings'});
+							that.fire('App', {typeFire: 'showSnack', message: 'Password changed.'});
+							that.fire('App', {typeFire: 'progressHide'});
+						}
+						that.fire('Baasbox', {typeFire: 'signOn', callbackSuccess:callback, callbackFail:callback, name:null, password: password});
+					};
+					this.fire('App', {typeFire: 'progressShow'});
+					this.fire('Baasbox', {typeFire: 'passwordChange', callbackSuccess:callbackSuccess, callbackFail:callbackFail, passwordCurrent: that.tempPasswordCurrent, password: password});
 				} else {
 					this.fire('Main', {typeFire: 'clearForms'});
 					this.fire('Main', {typeFire: 'clearPasswordConfirm'});

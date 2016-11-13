@@ -20,10 +20,10 @@
 			iron-pages {
 				/*min-height: 100vh;max-width: 1440px;margin: 0 auto;*/
 
-        margin: 0 auto;
-        padding: 0 24px 48px 24px;
-        max-width: 900px;
-        overflow: hidden;
+				margin: 0 auto;
+				padding: 0 24px 48px 24px;
+				max-width: 900px;
+				overflow: hidden;
 			}
 
 			/* small screen */
@@ -61,10 +61,10 @@
 				}
 			},
 
-      ready: function() {
+			ready: function() {
 				this.addEventListener('signOnClear', this._fireAction);
 				this.addEventListener('signUpClear', this._fireAction);
-      },
+			},
 
 			_fireAction: function(event) {
 				switch(event.type) {

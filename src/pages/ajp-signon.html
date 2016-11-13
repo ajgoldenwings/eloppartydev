@@ -77,11 +77,11 @@
 
 		</form>
 
-    <footer>
-			<ajp-button responsive responsive-left on-click="clearSignOn">
-				<a href="/welcome">Go Back</a>
-			</ajp-button>
-    </footer>
+		<footer>
+				<ajp-button responsive responsive-left on-click="clearSignOn">
+					<a href="/welcome">Go Back</a>
+				</ajp-button>
+		</footer>
 
 	</template>
 
@@ -100,49 +100,61 @@
 				this.$.accountPasswordSignOn.value = '';
 
 				var form = this.$.signonForm;
-        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
-          el.removeAttribute('aria-invalid');
+				for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+					el.removeAttribute('aria-invalid');
 				}
 			},
 
-      _signOn: function() {
+			_signOn: function() {
+				var that = this;
+				var callbackFail = function () {
+					that.fire('Authentication', {typeFire: 'signOnClear'});
+					that.fire('App', {typeFire: 'showSnack', message: 'Sign on failed.'});
+					that.fire('App', {typeFire: 'progressHide'});
+				};
+				var callbackSuccess = function () {
+					that.fire('App', {typeFire: 'setPage', page: ''});
+					that.fire('App', {typeFire: 'populateUserName', name: that.$.accountUsernameSignOn.value});
+					that.fire('Authentication', {typeFire: 'signOnClear'});
+					that.fire('App', {typeFire: 'progressHide'});
+				};
 				if (this._validateForm()) {
-					this.fire('Baasbox', {typeFire: 'signOn', name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
+					this.fire('Baasbox', {typeFire: 'signOn', callbackSuccess:callbackSuccess, callbackFail:callbackFail, name: this.$.accountUsernameSignOn.value, password: this.$.accountPasswordSignOn.value});
 				}
-      },
+			},
 
-      _validateForm: function() {
-        var form = this.$.signonForm, firstInvalid = false;
+			_validateForm: function() {
+				var form = this.$.signonForm, firstInvalid = false;
 
-        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
-          if (el.checkValidity()) {
-            el.removeAttribute('aria-invalid');
-          } else {
-            if (!firstInvalid) {
-              // announce error message
-              if (el.nextElementSibling) {
-                this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
-              }
-              if (el.scrollIntoViewIfNeeded) {
-                // safari, chrome
-                el.scrollIntoViewIfNeeded();
-              } else {
-                // firefox, edge, ie
-                el.scrollIntoView(false);
-              }
-              el.focus();
-              firstInvalid = true;
-            }
-            el.setAttribute('aria-invalid', 'true');
-          }
-        }
+				for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+					if (el.checkValidity()) {
+						el.removeAttribute('aria-invalid');
+					} else {
+						if (!firstInvalid) {
+							// announce error message
+							if (el.nextElementSibling) {
+							this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+							}
+							if (el.scrollIntoViewIfNeeded) {
+								// safari, chrome
+								el.scrollIntoViewIfNeeded();
+							} else {
+								// firefox, edge, ie
+								el.scrollIntoView(false);
+							}
+							el.focus();
+							firstInvalid = true;
+						}
+						el.setAttribute('aria-invalid', 'true');
+					}
+				}
 
 				if (firstInvalid) {
 					this.fire('fireShowSnack', {message: 'Sign on has failed. Please fill out and try again.'});
 				}
 
-        return !firstInvalid;
-      },
+				return !firstInvalid;
+			},
 
 		});
 

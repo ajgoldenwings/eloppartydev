@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
 
 <dom-module id="ajp-settings">
@@ -73,15 +75,25 @@
 				}
 			},
 
-      _getUserName: function() {
+			_getUserName: function() {
 				var currentUser = this.baasbox.getCurrentUser();
-				return  currentUser.username ||"Your Username";
-      },
+				return currentUser.username ||"Your Username";
+			},
 
-      _signOff: function() {
-				//this.fire('fireBaasboxSignOff');
-				this.fire('Baasbox', {typeFire: 'signOff'});
-      }
+			_signOff: function() {
+				var that = this;
+				var callbackFail = function () {
+					that.fire('App', {typeFire: 'setPage', page: 'signon'});
+					that.fire('App', {typeFire: 'showSnack', message: 'Logoff failed.'});
+					that.fire('App', {typeFire: 'progressHide'});
+				};
+				var callbackSuccess = function () {
+					that.fire('App', {typeFire: 'setPage', page: 'signon'});
+					that.fire('App', {typeFire: 'progressHide'});
+				};
+				this.fire('App', {typeFire: 'progressShow'});
+				this.fire('Baasbox', {typeFire: 'signOff', callbackSuccess:callbackSuccess, callbackFail:callbackFail});
+			}
 
 		});
 

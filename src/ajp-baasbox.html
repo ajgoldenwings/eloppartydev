@@ -22,7 +22,7 @@
 
 			},
 
-      ready: function() {
+			ready: function() {
 				this._setEndPoint("https://baasbox.elopparty.com");
 				this._setAppCode("1234567890");
 
@@ -32,16 +32,16 @@
 				this.addEventListener('signOff',            this._fireAction);
 				this.addEventListener('signOn',             this._fireAction);
 				this.addEventListener('signUp',             this._fireAction);
-      },
+			},
 
 			_fireAction: function(event) {
 				switch(event.type) {
 					case 'eventsLoad':         this.eventsLoad(event.detail.page);                                     break;
-					case 'passwordChange':     this.passwordChange(event.detail.passwordCurrent,event.detail.password);break;
-					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.password);                        break;
-					case 'signOff':            this.signOff();                                                         break;
-					case 'signOn':             this.signOn(event.detail.name, event.detail.password);                  break;
-					case 'signUp':             this.signUp(event.detail.name, event.detail.password);                  break;
+					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);break;
+					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                             break;
+					case 'signOff':            this.signOff(            event.detail.callbackSuccess,event.detail.callbackFail);                                                   break;
+					case 'signOn':             this.signOn(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.name, event.detail.password);          break;
+					case 'signUp':             this.signUp( event.detail.name, event.detail.password);                  break;
 					default:console.error('There was no matching details for the event that was listened by baasbox.', event);
 				}
 			},
@@ -57,88 +57,42 @@
 				});
 			},
 
-			passwordChange: function(passwordCurrent, password) {
-				this.fire('App', {typeFire: 'progressShow'});
-				var thisFunc = this;
+			passwordChange: function(callbackSuccess, callbackFail, passwordCurrent, password) {
 				BaasBox.changePassword(passwordCurrent, password)
-				.done(function(res) {
-					thisFunc.fire('Main', {typeFire: 'clearForms'});
-					thisFunc.fire('Main', {typeFire: 'clearPasswordConfirm'});
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Password changed.'});
-					thisFunc.signOn(thisFunc._getUserName(),password);
-				})
-				.fail(function(error) {
-					thisFunc.fire('Main', {typeFire: 'clearForms'});
-					thisFunc.fire('Main', {typeFire: 'clearPasswordConfirm'});
-					thisFunc.set('route.path', '/settings');
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Something went wrong when changing your password.'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-				});
+				.done(function(res) { callbackSuccess();})
+				.fail(function(error) { callbackFail();});
 			},
 
-      currentPasswordTest: function(password) {
-				this.fire('App', {typeFire: 'progressShow'});
-				var thisFunc = this;
+			currentPasswordTest: function(callbackSuccess, callbackFail, password) {
 				BaasBox.login(this._getUserName(), password)
-				.done(function (user) {
-					thisFunc.set('route.path', '/change-password-new');
-					thisFunc.fire('Main', {typeFire: 'clearForms'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-					thisFunc.fire('Main', {typeFire: 'passwordCurrentConfirmSet'});
-					thisFunc.fire('Main', {typeFire: 'passwordStoreCurrent', password: password});
-				})
-				.fail(function (err) {
-					thisFunc.fire('Main', {typeFire: 'clearForms'});
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'That is not your current password.'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-				});
-      },
+				.done(function (user) { callbackSuccess();})
+				.fail(function (err) { callbackFail();});
+			},
 
-      signOff: function() {
-				this.fire('App', {typeFire: 'progressShow'});
-				var thisFunc = this;
-				if(navigator.onLine){
+			signOff: function(callbackSuccess, callbackFail) {
+				if(navigator.onLine) {
 					BaasBox.logout()
-					.done(function (user) {
-						thisFunc.set('route.path', '/signon');
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-					})
-					.fail(function (err) {
-						thisFunc.set('route.path', '/signon');
-						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Logoff failed.'});
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-					});
+					.done(function (user) { callbackSuccess();})
+					.fail(function (err) { callbackFail();});
 				} else {
-					// Force Sign Off
-  			  var COOKIE_KEY = "baasbox-cookie";
+					var COOKIE_KEY = "baasbox-cookie";
 					if(window.Zepto && window.localStorage) {
 						window.localStorage.removeItem(COOKIE_KEY);
 					} else {
 						$.cookie(COOKIE_KEY, null);
 					}
-					thisFunc.set('route.path', '/signon');
-					thisFunc.fire('App', {typeFire: 'progressHide'});
+					console.error('Forced Sign Off');
+					callbackSuccess();
 				}
-      },
+			},
 
-      signOn: function(name,password) {
-				this.fire('App', {typeFire: 'progressShow'});
-				var thisFunc = this;
-				BaasBox.login(name, password)
-				.done(function (user) {
-					thisFunc.set('route.path', '/');
-					thisFunc.fire('Authentication', {typeFire: 'signOnClear'});
-					thisFunc.fire('App', {typeFire: 'populateUserName', name: user.username});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-				})
-				.fail(function (err) {
-					thisFunc.fire('Authentication', {typeFire: 'signOnClear'});
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Sign on failed.'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-				});
-      },
+			signOn: function(callbackSuccess, callbackFail, name, password) {
+				BaasBox.login(name || this._getUserName(), password)
+				.done(function (user) { callbackSuccess();})
+				.fail(function (err) { callbackFail();});
+			},
 
-      signUp: function(name,password) {
+			signUp: function(name,password) {
 				this.fire('App', {typeFire: 'progressShow'});
 				var thisFunc = this;
 				BaasBox.fetchUserProfile(name)
@@ -162,7 +116,8 @@
 						thisFunc.fire('App', {typeFire: 'progressHide'});
 					});
 				});
-      },
+			},
+
 
 			getCurrentUser: function() {
 				return BaasBox.getCurrentUser();
@@ -184,9 +139,9 @@
 				this.userName = name;
 			},
 
-      _initializeBaasbox: function() {
+			_initializeBaasbox: function() {
 
-      }
+			}
 
 		});
 
