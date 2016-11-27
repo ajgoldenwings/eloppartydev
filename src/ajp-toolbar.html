@@ -39,7 +39,7 @@
 				pointer-events: auto;
 			}
 
-			.to-settings  {
+			.to-settings {
 				display: none;
 			}
 
@@ -52,13 +52,15 @@
 			}
 
 			:host([page=event-add]) .back-btn,
-			:host([page=settings]) .back-btn  {
+			:host([page=settings]) .back-btn {
 				display: flex;
 			}
 
 			:host([page=change-password-confirm]) .to-settings,
 			:host([page=change-password-current]) .to-settings,
-			:host([page=change-password-new]) .to-settings  {
+			:host([page=change-password-new]) .to-settings,
+			:host([page=licenses]) .to-settings,
+			:host([page=terms]) .to-settings {
 				display: flex;
 			}
 
@@ -66,7 +68,9 @@
 			:host([page=settings]) .logo,
 			:host([page=change-password-confirm]) .logo,
 			:host([page=change-password-current]) .logo,
-			:host([page=change-password-new]) .logo {
+			:host([page=change-password-new]) .logo,
+			:host([page=licenses]) .logo,
+			:host([page=terms]) .logo {
 				padding-right: 40px;
 			}
 
