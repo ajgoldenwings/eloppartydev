@@ -37,48 +37,31 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
-					case 'eventAdd':           this.eventAdd(event.detail.title,event.detail.startTime,event.detail.length);break;
-					case 'eventsLoad':         this.eventsLoad(event.detail.page);                                     break;
-					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);break;
-					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                             break;
-					case 'signOff':            this.signOff(            event.detail.callbackSuccess,event.detail.callbackFail);                                                   break;
-					case 'signOn':             this.signOn(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.name, event.detail.password);          break;
-					case 'signUp':             this.signUp( event.detail.name, event.detail.password);                  break;
-					default:console.error('There was no matching details for the event that was listened by baasbox.', event);
+					case 'eventAdd':           this.eventAdd(           event.detail.callbackSuccess,event.detail.callbackFail,event.detail.title,event.detail.startTime,event.detail.length);               break;
+					case 'eventsLoad':         this.eventsLoad(         event.detail.callbackSuccess,event.detail.callbackFail,event.detail.page);                                                           break;
+					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);                          break;
+					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                                                       break;
+					case 'signOff':            this.signOff(            event.detail.callbackSuccess,event.detail.callbackFail);                                                                             break;
+					case 'signOn':             this.signOn(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.name, event.detail.password);                                    break;
+					case 'signUp':             this.signUp(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.callbackFailUserExists,event.detail.name, event.detail.password);break;
+					default:console.error('There was no matching details for the event that was listened by BaasBox.', event);
 				}
 			},
 
-			eventAdd: function(title,startTime,length) {
-				this.fire('App', {typeFire: 'progressShow'});
+			eventAdd: function(callbackSuccess, callbackFail, title, startTime, length) {
 				var elop_event = new Object();
-				var thisFunc = this;
 				elop_event.title = title;
 				elop_event.date = startTime;
 				elop_event.length = length;
 				BaasBox.save(elop_event, "elop_events")
-					.done(function(res) {
-						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Your event was added.'});
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-						thisFunc.fire('Main', {typeFire: 'unshiftEvent', event: res});
-						thisFunc.set('route.path', '/');
-					})
-					.fail(function(error) {
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Failed to add event.'});
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-						thisFunc.set('route.path', '/');
-					})
-
+				.done(function(res) { callbackSuccess(res);})
+				.fail(function(error) { callbackFail();});
 			},
 
-			eventsLoad: function(page) {
-				var thisFunc = this;
-				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5, orderBy: "_creation_date DESC"}).done(function(res) {
-					thisFunc.fire('Main', {typeFire: 'eventsPopulate', events: res, isEnd: res.length==0});
-				})
-				.fail(function(error) {
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'Failed to load events.'});
-					thisFunc.fire('Main', {typeFire: 'turnOffLoadingEvents'});
-				});
+			eventsLoad: function(callbackSuccess, callbackFail, page) {
+				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5, orderBy: "_creation_date DESC"})
+				.done(function(res) { callbackSuccess(res,res.length==0);})
+				.fail(function(error) { callbackFail();});
 			},
 
 			passwordChange: function(callbackSuccess, callbackFail, passwordCurrent, password) {
@@ -116,29 +99,13 @@
 				.fail(function (err) { callbackFail();});
 			},
 
-			signUp: function(name,password) {
-				this.fire('App', {typeFire: 'progressShow'});
-				var thisFunc = this;
+			signUp: function(callbackSuccess, callbackFail, callbackFailUserExists, name, password) {
 				BaasBox.fetchUserProfile(name)
-				.done(function(res) {
-					thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
-					thisFunc.fire('App', {typeFire: 'showSnack', message: 'User Exists.'});
-					thisFunc.fire('App', {typeFire: 'progressHide'});
-				})
+				.done(function(res) { callbackFailUserExists();})
 				.fail(function(error) {
 					BaasBox.signup(name, password)
-					.done(function (res) {
-						thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
-						thisFunc.set('route.path', '/');
-						thisFunc.fire('App', {typeFire: 'populateUserName', name: user.username});
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-					})
-					.fail(function (error) {
-						thisFunc.fire('Authentication', {typeFire: 'signUpClear'});
-						// TODO visibleByAnonymousUsers - need to add usernames, https://github.com/baasbox/baasbox/wiki/Plugin-Engine
-						thisFunc.fire('App', {typeFire: 'showSnack', message: 'Sign up failed. Try again.'});
-						thisFunc.fire('App', {typeFire: 'progressHide'});
-					});
+					.done(function (res) { callbackSuccess();})
+					.fail(function (error) { callbackFail();});
 				});
 			},
 

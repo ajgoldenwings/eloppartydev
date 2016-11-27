@@ -38,6 +38,27 @@
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
+		<!--<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+		<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+		<div id="notifications">
+			<h2>Notifications</h2>
+
+			<div role="listbox">
+				<paper-item class="border-bottom">
+					<paper-item-body two-line>
+						<div>Allow access to the Camera</div>
+						<div secondary>Allow Access to take pictures of events.</div>
+					</paper-item-body>
+				</paper-item>
+				<paper-item class="border-bottom">
+					<paper-item-body two-line>
+						<div>Allow access to the GPS</div>
+						<div secondary>Allow Access to get the location of the events.</div>
+					</paper-item-body>
+				</paper-item>
+			</div>
+		</div>-->
+
 		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
 			<ajp-event-add name="event-add"></ajp-event-add>
 			<ajp-action name="action"></ajp-action>

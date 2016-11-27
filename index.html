@@ -23,8 +23,7 @@
 			-khtml-user-select: none;    /* Konqueror */
 			-moz-user-select: none;      /* Firefox */
 			-ms-user-select: none;       /* Internet Explorer/Edge */
-			user-select: none;           /* Non-prefixed version, currently
-																			not supported by any browser */
+			user-select: none;           /* Non-prefixed version, currently not supported by any browser */
 		}
 
 		body {
@@ -47,9 +46,30 @@
 		}
 
 		ajp-app[unresolved] .title {
-			font-size: 25px;
+			font-size: 27px;
 			font-weight: 600;
 			letter-spacing: 0.1em;
+			color: #202020;
+			text-decoration: none;
+			display: inline-block;
+			pointer-events: auto;
+		}
+
+
+		::-webkit-scrollbar-track
+		{
+			border: 0 solid transparent;
+		}
+
+		::-webkit-scrollbar
+		{
+			width: 4px;
+			background-color: transparent;
+		}
+
+		::-webkit-scrollbar-thumb
+		{
+			background-color: #909090;
 		}
 
 	</style>

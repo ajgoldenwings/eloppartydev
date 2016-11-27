@@ -1,14 +1,12 @@
-<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
-<link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
-<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../styles/ajp-common-styles.html">
-<link rel="import" href="../components/ajp-list-event.html">
+	<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+	<link rel="import" href="../../bower_components/polymer/polymer.html">
+	<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+	<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+	<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+	<link rel="import" href="../styles/ajp-common-styles.html">
+	<link rel="import" href="../components/ajp-list-event.html">
 
-<dom-module id="ajp-events">
+	<dom-module id="ajp-events">
 
 	<template id="overlay">
 
@@ -36,50 +34,25 @@
 
 		</style>
 
-		<h2>Notifications</h2>
-
-		<div role="listbox">
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Allow access to the Camera</div>
-					<div secondary>Allow Access to take pictures of events.</div>
-				</paper-item-body>
-			</paper-item>
-			<paper-item class="border-bottom">
-				<paper-item-body two-line>
-					<div>Allow access to the GPS</div>
-					<div secondary>Allow Access to get the location of the events.</div>
-				</paper-item-body>
-			</paper-item>
-		</div>
-
-    <iron-list>
-      <template>
-        <div>
-					<span></span>
-        </div>
-      </template>
-    </iron-list>
-
 		<h2>Event List</h2>
 
-    <iron-list id="list" items="[]" as="event" scroll-target="document">
-      <template>
-        <div>
-					<ajp-list-event event=[[event]]></ajp-list-event>
-        </div>
-      </template>
-    </iron-list>
+		<iron-list id="list" items="[]" as="event" scroll-target="document">
+			<template>
+			<div>
+				<ajp-list-event event=[[event]]></ajp-list-event>
+			</div>
+			</template>
+		</iron-list>
 
-    <div class="loadingIndicator">
-      <paper-spinner active="{{loadingEvents}}"></paper-spinner>
-    </div>
+		<div class="loadingIndicator">
+			<paper-spinner active="{{loadingEvents}}"></paper-spinner>
+		</div>
 
 		<iron-scroll-threshold id="scrollTheshold"
-      lower-threshold="500"
-      on-lower-threshold="_loadMoreData"
-      scroll-target="document">
-    </iron-scroll-threshold>
+			lower-threshold="500"
+			on-lower-threshold="_loadMoreData"
+			scroll-target="document">
+		</iron-scroll-threshold>
 
 	</template>
 
@@ -91,9 +64,9 @@
 
 			properties: {
 				page: {
-          type: Number,
-          value: 0,
-          notify: true
+					type: Number,
+					value: 0,
+					notify: true
 				},
 
 				loadingEvents: {
@@ -117,23 +90,23 @@
 					time = 1300;
 					this.firstTimeEventsLoaded = false;
 				}
-				var thisFunc = this;
+				var that = this;
 				setTimeout(function(){
 					events.forEach(function(event) {
-						thisFunc.pushEvent(event);
+						that.pushEvent(event);
 					});
-					thisFunc.turnOffLoadingEvents();
+					that.turnOffLoadingEvents();
 					if (!isEnd) {
-						thisFunc.$.scrollTheshold.clearTriggers();
+						that.$.scrollTheshold.clearTriggers();
 					}
 				}, time);
 			},
 
-			pushEvent(event) {
+			pushEvent: function(event) {
 				this.$.list.push('items', event);
 			},
 
-			unshiftEvent(event) {
+			unshiftEvent: function(event) {
 				this.$.list.unshift('items', event);
 			},
 
@@ -143,8 +116,18 @@
 
 			_loadMoreData: function(e) {
 				this.loadingEvents = true;
-				this.fire('Baasbox', {typeFire: 'eventsLoad', page: this.page});
-				this.page++;
+				var that = this;
+				var callbackFail = function () {
+					that.fire('App', {typeFire: 'showSnack', message: 'Failed to load events.'});
+					that.fire('Main', {typeFire: 'turnOffLoadingEvents'});
+				};
+				var callbackSuccess = function (events,isEnd) {
+					that.fire('Main', {typeFire: 'eventsPopulate', events: events, isEnd: isEnd});
+					console.log(that.page);
+					that.page++;
+					console.log(that.page);
+				};
+				this.fire('Baasbox', {typeFire: 'eventsLoad', callbackSuccess:callbackSuccess, callbackFail:callbackFail, page: this.page});
 			}
 
 		});

@@ -89,11 +89,11 @@
 
 		</form>
 
-    <footer>
-			<ajp-button responsive responsive-left on-click="clearSignUp">
-				<a href="/welcome">Go Back</a>
-			</ajp-button>
-    </footer>
+	<footer>
+		<ajp-button responsive responsive-left on-click="clearSignUp">
+			<a href="/welcome">Go Back</a>
+		</ajp-button>
+	</footer>
 
 	</template>
 
@@ -117,59 +117,78 @@
 				this._clearPasswords();
 
 				var form = this.$.signonForm;
-        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
-          el.removeAttribute('aria-invalid');
+				for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+					el.removeAttribute('aria-invalid');
 				}
 			},
 
-      _didReceiveResponse: function(e) {
+			_didReceiveResponse: function(e) {
 
 				console.log("_didReceiveResponse");
-        // var response = e.detail.response;
+				// var response = e.detail.response;
 
-        // this.response = response;
-        // this._setWaiting(true);
+				// this.response = response;
+				// this._setWaiting(true);
 
-        // if (response.success) {
-        //   this._pushState('success');
-        //   this._reset();
-        //   this.fire('clear-cart');
-        // } else {
-        //   this._pushState('error');
-        // }
-      },
+				// if (response.success) {
+				//   this._pushState('success');
+				//   this._reset();
+				//   this.fire('clear-cart');
+				// } else {
+				//   this._pushState('error');
+				// }
+			},
 
-      _signUp: function() {
+			_signUp: function() {
 				if (this._validateForm()) {
-					this.fire('Baasbox', {typeFire: 'signUp', name: this.$.accountUsername.value, password: this.$.accountPassword.value});
+					this.fire('App', {typeFire: 'progressShow'});
+					var that = this;
+					var callbackFail = function () {
+						that.fire('Authentication', {typeFire: 'signUpClear'});
+						// TODO visibleByAnonymousUsers - need to add usernames, https://github.com/baasbox/baasbox/wiki/Plugin-Engine
+						that.fire('App', {typeFire: 'showSnack', message: 'Sign up failed. Try again.'});
+						that.fire('App', {typeFire: 'progressHide'});
+					};
+					var callbackFailUserExists = function () {
+						that.fire('Authentication', {typeFire: 'signUpClear'});
+						that.fire('App', {typeFire: 'showSnack', message: 'User Exists.'});
+						that.fire('App', {typeFire: 'progressHide'});
+					};
+					var callbackSuccess = function () {
+						that.fire('Authentication', {typeFire: 'signUpClear'});
+						that.fire('App', {typeFire: 'setPage', page: ''});
+						that.fire('App', {typeFire: 'populateUserName', name: user.username});
+						that.fire('App', {typeFire: 'progressHide'});
+					};
+					this.fire('Baasbox', {typeFire: 'signUp', callbackSuccess:callbackSuccess, callbackFail:callbackFail, callbackFailUserExists:callbackFailUserExists, name: this.$.accountUsername.value, password: this.$.accountPassword.value});
 				}
-      },
+			},
 
-      _validateForm: function() {
-        var form = this.$.signonForm, firstInvalid = false;
+			_validateForm: function() {
+				var form = this.$.signonForm, firstInvalid = false;
 
-        for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
-          if (el.checkValidity()) {
-            el.removeAttribute('aria-invalid');
-          } else {
-            if (!firstInvalid) {
-              // announce error message
-              if (el.nextElementSibling) {
-                this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
-              }
-              if (el.scrollIntoViewIfNeeded) {
-                // safari, chrome
-                el.scrollIntoViewIfNeeded();
-              } else {
-                // firefox, edge, ie
-                el.scrollIntoView(false);
-              }
-              el.focus();
-              firstInvalid = true;
-            }
-            el.setAttribute('aria-invalid', 'true');
-          }
-        }
+				for (var el, i = 0; el = form.elements[i], i < form.elements.length; i++) {
+					if (el.checkValidity()) {
+						el.removeAttribute('aria-invalid');
+					} else {
+						if (!firstInvalid) {
+							// announce error message
+							if (el.nextElementSibling) {
+								this.fire('announce', el.nextElementSibling.getAttribute('error-message'));
+							}
+							if (el.scrollIntoViewIfNeeded) {
+								// safari, chrome
+								el.scrollIntoViewIfNeeded();
+							} else {
+								// firefox, edge, ie
+								el.scrollIntoView(false);
+							}
+							el.focus();
+							firstInvalid = true;
+						}
+						el.setAttribute('aria-invalid', 'true');
+					}
+				}
 
 				if (firstInvalid) {
 					this.fire('fireShowSnack', {message: 'Sign up has failed. Please fill out and try again.'});
@@ -182,8 +201,8 @@
 					}
 				}
 
-        return !firstInvalid;
-      },
+				return !firstInvalid;
+			},
 
 			_passMatch: function(password,passwordConfirm) {
 				if(password.value != passwordConfirm.value){
@@ -194,27 +213,27 @@
 				}
 			},
 
-      _willSendRequest: function(e) {
+			_willSendRequest: function(e) {
 
-				console.log("_willSendRequest");
-        // var form = e.target;
-        // var body = form.request.body;
+				console.log("info _willSendRequest");
+				// var form = e.target;
+				// var body = form.request.body;
 
-        // this._setWaiting(true);
+				// this._setWaiting(true);
 
-        // if (!body) {
-        //   return;
-        // }
-        // // Populate the request body where `cartItemsId[i]` is the ID and `cartItemsQuantity[i]`
-        // // is the quantity for some item `i`.
-        // body.cartItemsId = [];
-        // body.cartItemsQuantity = [];
+				// if (!body) {
+				//   return;
+				// }
+				// // Populate the request body where `cartItemsId[i]` is the ID and `cartItemsQuantity[i]`
+				// // is the quantity for some item `i`.
+				// body.cartItemsId = [];
+				// body.cartItemsQuantity = [];
 
-        // this.cart.forEach(function(cartItem) {
-        //   body.cartItemsId.push(cartItem.item.name);
-        //   body.cartItemsQuantity.push(cartItem.quantity);
-        // });
-      }
+				// this.cart.forEach(function(cartItem) {
+				//   body.cartItemsId.push(cartItem.item.name);
+				//   body.cartItemsQuantity.push(cartItem.quantity);
+				// });
+			}
 
 		});
 
