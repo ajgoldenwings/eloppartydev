@@ -33,7 +33,7 @@
 
 		<iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
 
-		<ajp-toolbar page="[[page]]"></ajp-toolbar>
+		<ajp-toolbar user-defined="[[userDefined]]" page="[[page]]"></ajp-toolbar>
 
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
@@ -102,6 +102,10 @@
 					reflectToAttribute: true,
 					value: "Your Username"
 				},
+
+				userDefined: {
+					type: Boolean
+				}
 
 			},
 

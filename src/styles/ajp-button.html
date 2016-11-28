@@ -3,12 +3,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <dom-module id="ajp-button">
-  <template>
-    <style>
+	<template>
+		<style>
 
-      ajp-button {
-        display: inline-block;
-      }
+			ajp-button {
+				display: inline-block;
+			}
 
 			ajp-button > * {
 				display: inline-block;
@@ -17,7 +17,7 @@
 				font-size: 14px;
 				font-weight: 500;
 
-        /*color: var(--app-primary-color);*/
+			/*color: var(--app-primary-color);*/
 				color: #202020;
 
 				margin: 0;
@@ -30,77 +30,48 @@
 				-webkit-appearance: none;
 			}
 
-      ajp-button > *:focus {
-        background-color: #c5cad3;
-      }
+			ajp-button > *:focus {
+				background-color: #c5cad3;
+			}
 
-      ajp-button > *:active {
-        background-color: #000;
-        color: #FFF;
-      }
+			ajp-button > *:active {
+				background-color: #000;
+				color: #FFF;
+			}
 
-      @media (max-width: 767px) {
+			@media (max-width: 767px) {
 
-        ajp-button[responsive] {
-          /*@apply(--layout-fixed-bottom);*/
-					position: fixed;
-					right: 0;
-					bottom: 0;
-					left: 0;
+				ajp-button[responsive] {
+					height: 64px;
+				}
 
-          height: 64px;
-          z-index: 1;
-        }
-
-        ajp-button[responsive] > * {
-          /*background-color: var(--app-accent-color);*/
+				ajp-button[responsive] > * {
+					/*background-color: var(--app-accent-color);*/
 					background-color: #172C50;
+					border: none;
+					color: white;
+					font-size: 18px;
+				}
 
-          border: none;
-          color: white;
-          padding: 20px;
-          width: 100%;
-          height: 100%;
-          font-size: 18px;
-        }
+				ajp-button[responsive] > *:focus {
+					/*background-color: var(--app-accent-color);*/
+				}
+			}
 
-        ajp-button[responsive] > *:focus {
-          /*background-color: var(--app-accent-color);*/
-        }
+			@media (max-height: 500px) and (max-width: 767px) {
+				ajp-button[responsive] {
+					height: 32px;
+				}
 
-        ajp-button[responsive-1] {
-					bottom: 64px;
-        }
-
-        ajp-button[responsive-left] {
-					right: initial;
-          width: 50%;
-        }
-
-        ajp-button[responsive-right] {
-					left: initial;
-          width: 50%;
-        }
-
-      }
-
-      @media (max-height: 500px) and (max-width: 767px) {
-
-        ajp-button[responsive] {
-          height: 32px;
-        }
-
-        ajp-button[responsive] > * {
+				ajp-button[responsive] > * {
 					font-size: 0.9em;
-          padding: 5px;
-        }
+					padding: 5px;
+				}
 
-        ajp-button[responsive-1] {
+				ajp-button[responsive-1] {
 					bottom: 32px;
-        }
-
-      }
-
-    </style>
-  </template>
+				}
+			}
+		</style>
+	</template>
 </dom-module>

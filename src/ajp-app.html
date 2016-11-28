@@ -70,9 +70,8 @@
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-container-main>
+			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]"></ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]"></ajp-container-authentication>
 			<ajp-container-welcome name="welcome" id="welcome"></ajp-container-welcome>
 		</iron-pages>
@@ -122,7 +121,12 @@
 
 				unregisteredUserPages: {
 					type: Object,
-					value: ['signon','signup','welcome']
+					value: ['signon','signup','terms','welcome']
+				},
+
+				userDefined: {
+					type: Boolean,
+					value: false
 				},
 
 				userName: {
@@ -217,9 +221,10 @@
 			_getIronPageValue: function(page) {
 				// TODO: Make 404 page
 				var currentUser = this.$.baasbox.getCurrentUser();
-				if (this._isUserDefined(currentUser) && (page == "" || !this._isInRegisteredUserPages(page))) {
+				this.userDefined = this._isUserDefined(currentUser);
+				if (this.userDefined && (page == "" || !this._isInRegisteredUserPages(page))) {
 					page = 'events';
-				} else if (!this._isUserDefined(currentUser) && (page == "" || !this._isInUnregisteredUserPages(page))) {
+				} else if (!this.userDefined && (page == "" || !this._isInUnregisteredUserPages(page))) {
 					if (this.appStorage.welcomed) {
 						page = 'signon';
 					} else {

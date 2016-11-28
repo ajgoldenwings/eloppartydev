@@ -11,7 +11,10 @@
 	<template>
 
 		<style include="ajp-button ajp-common-styles ajp-input ajp-form-styles">
-
+			.terms {
+				margin: 20px 0;
+				color:#606060;
+			}
 		</style>
 
 		<form
@@ -27,7 +30,6 @@
 
 			<div class="subsection grid">
 				<section>
-
 					<div class="row input-row">
 						<ajp-input>
 							<input type="username" id="accountUsername" name="accountUsername"
@@ -64,15 +66,17 @@
 						</ajp-input>
 					</div>
 
+					<div responsive responsive-2 class="row input-row">
+						<small class="terms">By signing up, you agree to the <a href="/terms">Terms of Elop Party</a>.</small>
+					</div>
+
 					<div class="row input-row">
 						<ajp-button responsive responsive-1 on-click="_signUp">
 							<a>Sign Up</a>
 						</ajp-button>
 					</div>
-
 				</section>
 				<section responsive-hidden>
-
 					<div class="row input-row">
 						<paper-card heading="Already have a accout?" class="white" elevation="2">
 							<div class="card-content">Go sign on to your account here.</div>
@@ -83,17 +87,14 @@
 							</div>
 						</paper-card>
 					</div>
-
 				</section>
 			</div>
-
 		</form>
-
-	<footer>
-		<ajp-button responsive responsive-left on-click="clearSignUp">
-			<a href="/welcome">Go Back</a>
-		</ajp-button>
-	</footer>
+		<footer bottom>
+			<ajp-button responsive responsive-left on-click="clearSignUp">
+				<a href="/welcome">Go Back</a>
+			</ajp-button>
+		</footer>
 
 	</template>
 

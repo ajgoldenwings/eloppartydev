@@ -17,47 +17,46 @@
 				white-space: nowrap;
 			}
 
-      .main-frame {
-        margin: 0 auto;
-        padding: 0 24px 48px 24px;
-        max-width: 900px;
-        overflow: hidden;
-      }
+			.main-frame {
+				margin: 0 auto;
+				padding: 0 24px 48px 24px;
+				max-width: 900px;
+				overflow: hidden;
+			}
 
-      .grid {
-        margin-top: 40px;
-        @apply(--layout-horizontal);
-      }
+			.grid {
+				margin-top: 40px;
+				@apply(--layout-horizontal);
+			}
 
-      .grid > section {
-        @apply(--layout-flex);
-				margin-bottom: 80px;
-      }
+			.grid > section {
+				@apply(--layout-flex);
+						margin-bottom: 80px;
+			}
 
 			.grid > section:not(:first-child) {
 				margin-left: 80px;
 			}
 
-      .row {
-        @apply(--layout-horizontal);
-        @apply(--layout-end);
-      }
+			.row {
+				@apply(--layout-horizontal);
+				@apply(--layout-end);
+			}
 
-      .column {
-        @apply(--layout-vertical);
-      }
+			.column {
+				@apply(--layout-vertical);
+			}
 
-      .row > .flex,
-      .input-row > * {
-        @apply(--layout-flex);
-      }
+			.row > .flex,
+			.input-row > * {
+				@apply(--layout-flex);
+			}
 
-      .input-row > *:not(:first-child) {
-        margin-left: 8px;
-      }
+			.input-row > *:not(:first-child) {
+				margin-left: 8px;
+			}
 
-      @media (max-width: 767px) {
-
+			@media (max-width: 767px) {
 				div[responsive-show] {
 					display: inline;
 				}
@@ -67,22 +66,21 @@
 					position: fixed;
 				}
 
-        .grid {
-          display: block;
-          margin-top: 0;
-        }
+				.grid {
+					display: block;
+					margin-top: 0;
+				}
 
 				.grid > section {
 					margin-bottom: 0px;
 				}
 
-        .grid > section:not(:first-child) {
-          margin-left: 0;
-        }
+				.grid > section:not(:first-child) {
+					margin-left: 0;
+				}
+			}
 
-      }
-
-      @media (min-width: 768px) {
+			@media (min-width: 768px) {
 				.flex-horizontal-with-ratios {
 					@apply(--layout-horizontal);
 				}
@@ -92,8 +90,7 @@
 				.flex3child {
 					@apply(--layout-flex-3);
 				}
-      }
-
+			}
 		</style>
 	</template>
 </dom-module>

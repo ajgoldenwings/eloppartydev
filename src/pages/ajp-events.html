@@ -123,9 +123,7 @@
 				};
 				var callbackSuccess = function (events,isEnd) {
 					that.fire('Main', {typeFire: 'eventsPopulate', events: events, isEnd: isEnd});
-					console.log(that.page);
 					that.page++;
-					console.log(that.page);
 				};
 				this.fire('Baasbox', {typeFire: 'eventsLoad', callbackSuccess:callbackSuccess, callbackFail:callbackFail, page: this.page});
 			}
