@@ -12,8 +12,13 @@
 
 		<style include="ajp-button ajp-common-styles ajp-input ajp-form-styles">
 			.terms {
-				margin: 20px 0;
 				color:#606060;
+			}
+
+			@media (min-height: 500px), (min-width: 767px) {
+				.terms {
+					margin: 0 0 10px 0;
+				}
 			}
 		</style>
 
@@ -90,7 +95,7 @@
 				</section>
 			</div>
 		</form>
-		<footer bottom>
+		<footer>
 			<ajp-button responsive responsive-left on-click="clearSignUp">
 				<a href="/welcome">Go Back</a>
 			</ajp-button>
