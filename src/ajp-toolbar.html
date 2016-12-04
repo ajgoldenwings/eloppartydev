@@ -8,6 +8,10 @@
 	<template>
 
 		<style include="ajp-common-styles">
+			:host {
+				--paper-icon-button-ink-color: var(--app-accent-color);
+			}
+
 			app-header {
 				@apply(--layout-fixed-top);
 				z-index: 1;
@@ -38,34 +42,19 @@
 				pointer-events: auto;
 			}
 
-			.to-settings {
-				display: none;
-			}
-
-			:host {
-				--paper-icon-button-ink-color: var(--app-accent-color);
-			}
-
-			.back-btn, .to-settings, .to-signup {
+			.back-btn {
 				display: none;
 			}
 
 			:host([page=event-add]) .back-btn,
-			:host([page=settings]) .back-btn {
+			:host([page=settings]) .back-btn,
+			:host([page=change-password-confirm]) .back-btn,
+			:host([page=change-password-current]) .back-btn,
+			:host([page=change-password-new]) .back-btn,
+			:host([page=licenses]) .back-btn,
+			:host([page=terms]) .back-btn {
 				display: flex;
 			}
-
-			:host([page=change-password-confirm]) .to-settings,
-			:host([page=change-password-current]) .to-settings,
-			:host([page=change-password-new]) .to-settings,
-			:host([page=licenses]) .to-settings,
-			:host([page=terms]) .to-settings {
-				display: flex;
-			}
-
-			/*:host([!userDefined]) .to-signup {
-				display: flex;
-			}*/
 
 			:host([page=event-add]) .logo,
 			:host([page=settings]) .logo,
@@ -81,20 +70,10 @@
 		<app-header role="navigation" id="header" effects="waterfall" condenses reveals>
 			<app-toolbar>
 				<div class="left-bar-item">
-					<a class="back-btn" href="/action" tabindex="-1">
+					<a id="back" class="back-btn" href="/action" tabindex="-1">
 						<paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
 					</a>
 				</div>
-				<div class="left-bar-item">
-					<a class="to-settings" href="/settings">
-						<paper-icon-button icon="arrow-back" aria-label="Go back" on-click="_clearForms"></paper-icon-button>
-					</a>
-				</div>
-				<!--<div class="left-bar-item">
-					<a class="to-signup" href="/signup">
-						<paper-icon-button icon="arrow-back" aria-label="Go back" on-click="_clearForms"></paper-icon-button>
-					</a>
-				</div>-->
 
 				<iron-pages id="logo" role="titleLink" selected="[[title]]" attr-for-selected="name" selected-attribute="visible" selected="home" fallbackSelection="home" title>
 					<div class="logo action" name="action"><a href="/" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
@@ -141,8 +120,26 @@
 				} else {
 					this.title = 'action';
 				}
-			}
 
+				this._updateBack(page, oldPage);
+			},
+
+			_updateBack(page, oldPage) {
+				var backPage = "";
+
+				if (["licenses","terms"].indexOf(page) != -1) {
+					oldPage=="signup"?backPage="signup":backPage="settings";
+				} else if (["change-password-current", "change-password-new", "change-password-confirm"].indexOf(page) != -1) {
+					this._clearForms();
+					backPage="settings";
+				} else if (["settings"].indexOf(page) != -1) {
+					backPage="action";
+				} else {
+					backPage=oldPage;
+				}
+
+				this.$.back.setAttribute("href", "/"+backPage);
+			}
 		});
 
 	</script>

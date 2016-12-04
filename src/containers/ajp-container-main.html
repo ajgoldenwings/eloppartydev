@@ -1,13 +1,15 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
 <link rel="import" href="../ajp-toolbar.html">
 
 <dom-module id="ajp-container-main">
 
 	<template>
 
-		<style>
+		<style include="ajp-common-styles">
 
 			:host {
 				display: block;
@@ -20,13 +22,6 @@
 				padding: 0 15px 28px 15px;
 				max-width: 900px;
 				overflow: hidden;
-			}
-
-			/* small screen */
-			@media (max-width: 767px) {
-				:host {
-
-				}
 			}
 
 		</style>
@@ -60,16 +55,16 @@
 		</div>-->
 
 		<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-event-add name="event-add"></ajp-event-add>
-			<ajp-action name="action"></ajp-action>
-			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"></ajp-change-password-current>
-			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"></ajp-change-password-confirm>
-			<ajp-change-password-new name="change-password-new" id="changepasswordnew"></ajp-change-password-new>
-			<ajp-events name="events" id="events"></ajp-events>
-			<ajp-licenses name="licenses"></ajp-licenses>
-			<ajp-terms name="terms"></ajp-terms>
-			<ajp-user-info name="user-info"></ajp-user-info>
-			<ajp-settings name="settings" baasbox="[[baasbox]]" user-name="[[userName]]"></ajp-settings>
+			<ajp-event-add name="event-add"><paper-spinner active></paper-spinner></ajp-event-add>
+			<ajp-action name="action"><paper-spinner active></paper-spinner></ajp-action>
+			<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"><paper-spinner active></paper-spinner></ajp-change-password-current>
+			<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"><paper-spinner active></paper-spinner></ajp-change-password-confirm>
+			<ajp-change-password-new name="change-password-new" id="changepasswordnew"><paper-spinner active></paper-spinner></ajp-change-password-new>
+			<ajp-events name="events" id="events"><paper-spinner active></paper-spinner></ajp-events>
+			<ajp-licenses name="licenses"><paper-spinner active></paper-spinner></ajp-licenses>
+			<ajp-terms name="terms"><paper-spinner active></paper-spinner></ajp-terms>
+			<ajp-user-info name="user-info"><paper-spinner active></paper-spinner></ajp-user-info>
+			<ajp-settings name="settings" baasbox="[[baasbox]]" user-name="[[userName]]"><paper-spinner active></paper-spinner></ajp-settings>
 		</iron-pages>
 
 	</template>

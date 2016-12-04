@@ -17,7 +17,7 @@
 			}
 
 			.bottom {
-			  position: absolute;
+				position: absolute;
 				bottom: 0;
 				left: 0;
 				right: 0;
@@ -79,7 +79,7 @@
 			.eventItemContent .eventItemDetailsEvent {
 				font-size: 0.68em;
 				display: flex;
-  			flex-direction: column;
+				flex-direction: column;
 			}
 
 			.eventItemContent .eventItemDetailsPromoter {
@@ -125,10 +125,51 @@
 				height: 1em;
 			}
 
-			font-size: .8em;
-
 			paper-material {
 				color: #222;
+			}
+
+			@media (min-width: 500px) {
+				.eventItemActions {
+					-webkit-padding-after: 0.63em;
+					-webkit-padding-before: 0.63em;
+					-webkit-padding-start: 0.63em;
+					-webkit-padding-end: 0.63em;
+				}
+
+				.eventItemContent .eventItemTitle {
+					font-size: 1.87em;
+					-webkit-padding-start: 0.43em;
+					-webkit-padding-end: 0.43em;
+				}
+
+				.eventItemContent .eventItemDetailsPromoter {
+					font-size: 1.35em;
+				}
+
+				.eventItemContent .eventItemDetails {
+					-webkit-padding-before: 0.13em;
+					-webkit-padding-after: 0.13em;
+					-webkit-padding-start: 0.65em;
+					-webkit-padding-end: 0.65em;
+				}
+
+				.eventItemContent .eventItemDetailsEvent {
+					font-size: 1.18em;
+				}
+
+				.eventItemContent .eventItemDetailsPromoter {
+					font-size: 1.18em;
+				}
+
+				.topMargin {
+					margin-top: 0.43em;
+					-webkit-margin-before:0.43em;
+				}
+
+				.score {
+					font-size: 1.3em
+				}
 			}
 
 		</style>

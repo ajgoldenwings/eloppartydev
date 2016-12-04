@@ -19,11 +19,8 @@
 <link rel="import" href="ajp-toolbar.html">
 
 <dom-module id="ajp-app">
-
 	<template>
-
 		<style>
-
 			:host {
 				display: block;
 				position: relative;
@@ -60,31 +57,27 @@
 				width: 100%;
 				z-index: 2;
 			}
-
 		</style>
 
 		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
 		<iron-localstorage name="ajp-app-storage" value="{{appStorage}}" on-iron-localstorage-load-empty="initializeDefaultAppStorage"></iron-localstorage>
 
-
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]"></ajp-container-main>
-			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]"></ajp-container-authentication>
-			<ajp-container-welcome name="welcome" id="welcome"></ajp-container-welcome>
+			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
+			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
+			<ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome>
 		</iron-pages>
 
 		<paper-progress name="progress" id="progress" hidden indeterminate></paper-progress>
 
 		<!-- a11y announcer -->
 		<div class="announcer" aria-live="assertive">[[_a11yLabel]]</div>
-
 	</template>
 
 	<script>
-
 		// performance logging
 		window.performance && performance.mark && performance.mark('ajp-app - before register');
 
@@ -144,7 +137,6 @@
 				}
 
 			},
-
 
 			observers: [
 				'_routePageChanged(routeData.page)'
@@ -228,7 +220,7 @@
 					if (this.appStorage.welcomed) {
 						page = 'signon';
 					} else {
-      			this.set('appStorage.welcomed', true);
+						this.set('appStorage.welcomed', true);
 						page = 'welcome';
 					}
 				}
@@ -369,9 +361,6 @@
 					}
 				}
 			}
-
 		});
-
 	</script>
-
 </dom-module>
