@@ -13,9 +13,7 @@
 	</template>
 
 	<script>
-
 		Polymer({
-
 			is: 'ajp-baasbox',
 
 			properties: {
@@ -53,34 +51,39 @@
 				elop_event.title = title;
 				elop_event.date = startTime;
 				elop_event.length = length;
+				var resultTemp;
 				BaasBox.save(elop_event, "elop_events")
-				.done(function(res) { callbackSuccess(res);})
-				.fail(function(error) { callbackFail();});
+				.done(function(res) {
+					resultTemp = res;
+					BaasBox.grantRoleAccessToObject("elop_events", res.id, BaasBox.READ_PERMISSION, BaasBox.REGISTERED_ROLE)
+					.done(function(res) { callbackSuccess(resultTemp)})
+					.fail(function(err) { callbackFail()})})
+				.fail(function(err) { callbackFail()});
 			},
 
 			eventsLoad: function(callbackSuccess, callbackFail, page) {
 				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5, orderBy: "_creation_date DESC"})
-				.done(function(res) { callbackSuccess(res,res.length==0);})
-				.fail(function(error) { callbackFail();});
+				.done(function(res) { callbackSuccess(res,res.length==0)})
+				.fail(function(err) { callbackFail()});
 			},
 
 			passwordChange: function(callbackSuccess, callbackFail, passwordCurrent, password) {
 				BaasBox.changePassword(passwordCurrent, password)
-				.done(function(res) { callbackSuccess();})
-				.fail(function(error) { callbackFail();});
+				.done(function(res) { callbackSuccess()})
+				.fail(function(err) { callbackFail()});
 			},
 
 			currentPasswordTest: function(callbackSuccess, callbackFail, password) {
 				BaasBox.login(this._getUserName(), password)
-				.done(function (user) { callbackSuccess();})
-				.fail(function (err) { callbackFail();});
+				.done(function (res) { callbackSuccess()})
+				.fail(function (err) { callbackFail()});
 			},
 
 			signOff: function(callbackSuccess, callbackFail) {
 				if(navigator.onLine) {
 					BaasBox.logout()
-					.done(function (user) { callbackSuccess();})
-					.fail(function (err) { callbackFail();});
+					.done(function (res) { callbackSuccess()})
+					.fail(function (err) { callbackFail()});
 				} else {
 					var COOKIE_KEY = "baasbox-cookie";
 					if(window.Zepto && window.localStorage) {
@@ -95,17 +98,17 @@
 
 			signOn: function(callbackSuccess, callbackFail, name, password) {
 				BaasBox.login(name || this._getUserName(), password)
-				.done(function (user) { callbackSuccess();})
-				.fail(function (err) { callbackFail();});
+				.done(function (res) { callbackSuccess()})
+				.fail(function (err) { callbackFail()});
 			},
 
 			signUp: function(callbackSuccess, callbackFail, callbackFailUserExists, name, password) {
 				BaasBox.fetchUserProfile(name)
-				.done(function(res) { callbackFailUserExists();})
+				.done(function(res) { callbackFailUserExists()})
 				.fail(function(error) {
 					BaasBox.signup(name, password)
-					.done(function (res) { callbackSuccess();})
-					.fail(function (error) { callbackFail();});
+					.done(function (res) { callbackSuccess()})
+					.fail(function (err) { callbackFail()});
 				});
 			},
 
@@ -133,9 +136,6 @@
 			_initializeBaasbox: function() {
 
 			}
-
 		});
-
 	</script>
-
 </dom-module>
