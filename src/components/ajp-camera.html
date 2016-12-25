@@ -1,0 +1,186 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="ajp-camera">
+	<template>
+		<style>
+			.videoContainer {
+				background-color: grey;
+				border: 2px solid #000;
+				line-height: 0;
+				/*display: block;*/
+				/*margin: 0 auto;*/
+				overflow: hidden;
+			}
+
+			#videoId{
+				/*max-height: 400px;*/
+				max-width: 400px;
+				width: 100%;
+				/*object-fit: fill;*/
+				display: block;
+				margin: 0 auto;
+
+				object-fit: cover;
+				overflow: hidden;
+			}
+
+			#videoId[is-pip]{
+				transform-origin: top left;
+				transform: scale(0.2,0.2);
+				position: absolute;
+				transition: transform 0.3s;
+			}
+
+			#videoId[is-closed]{
+				display: none;
+			}
+
+			div.select {
+				margin: 0 0 1em 0;
+			}
+		</style>
+		<div class="videoContainer">
+			<video id="videoId" on-tap="snap"></video>
+			<canvas id="canvas" style="display:none"></canvas>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: "ajp-camera",
+
+			properties: {
+				captureHeight: {
+					type: Number,
+					value: 400
+				},
+				captureWidth: {
+					type: Number,
+					value: 400
+				},
+				screenshot: {
+					type: String,
+					notify: true
+				},
+				videoelement: {
+					type: Object,
+					notify: true
+				},
+				stream: {
+					type: Object,
+					notify: true,
+					observer: '_stream_changed'
+				},
+				waitforinput: {
+					type: Boolean,
+					value: false,
+					observer: '_wfi_changed'
+				}
+			},
+
+			attached: function(){
+				// Grab elements, create settings, etc.
+				var canvas = this.$.canvas;
+
+				var video = this.$.videoId;
+
+				this.videoelement = video;
+
+				var context = canvas.getContext("2d");
+				var videoObj = { "video": true };
+				var errBack = function(error) {
+					console.log("Video capture error: ", error.code);
+				};
+
+				// Put video listeners into place
+				var me=this;
+
+				navigator.getMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+
+				if(!this.waitforinput){
+					navigator.getMedia(videoObj, function(stream){
+						me.set('videoelement.src', window.URL.createObjectURL(stream));
+						me.set('stream', stream);
+						//video.src=window.URL.createObjectURL(stream);
+						video.play();
+					}, errBack);
+					/*if(navigator.getUserMedia) { // Standard
+						navigator.getUserMedia(videoObj, function(stream) {
+							me.set('videoelement.src', stream);
+							video.play();
+						}, errBack);
+					} else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
+						navigator.webkitGetUserMedia(videoObj, function(stream){
+							me.set('videoelement.src', window.URL.createObjectURL(stream));
+							me.set('stream', stream);
+							//video.src=window.URL.createObjectURL(stream);
+							video.play();
+						}, errBack);
+					}
+					else if(navigator.mozGetUserMedia) { // Firefox-prefixed
+						navigator.mozGetUserMedia(videoObj, function(stream){
+							me.set('videoelement.src', window.URL.createObjectURL(stream));
+							me.set('stream', stream);
+							video.play();
+						}, errBack);
+					}*/
+				}
+			},
+
+			_wfi_changed: function(){
+				if (this.waitforinput)
+					this.$.videoId.setAttribute('is-closed', true);
+			},
+
+			_stream_changed: function(){
+				if (this.stream){
+					this.$.videoId.removeAttribute('is-closed');
+					if(this.waitforinput){
+						this.set('videoelement.src', window.URL.createObjectURL(this.stream));
+						this.$.videoId.play();
+						/*if(navigator.getUserMedia) {
+							this.set('videoelement.src', this.stream);
+						}else{
+							this.set('videoelement.src', window.URL.createObjectURL(this.stream));
+						}*/
+					}
+				} else {
+					this.$.videoId.setAttribute('is-closed', true);
+				}
+			},
+
+			snap: function(){
+				this.takePicture(true);
+			},
+
+			hide: function(){
+				this.$.videoId.setAttribute('is-closed', true);
+			},
+
+			pip: function(){
+				if (this.$.videoId.hasAttribute('is-pip')) {
+					this.$.videoId.removeAttribute('is-pip');
+				}else{
+					this.$.videoId.setAttribute('is-pip', true);
+				}
+			},
+
+			takePicture: function(actually){
+				if(actually){
+					var canvas = this.$.canvas;
+					var videoObj = this.$.videoId;
+					var context = canvas.getContext('2d');
+
+					videoObj.setAttribute('width', videoObj.clientWidth);
+					videoObj.setAttribute('height', videoObj.clientHeight);
+
+					canvas.width = videoObj.clientWidth;
+					canvas.height = videoObj.clientHeight;
+
+					context.drawImage(videoObj, 0, 0, this.captureWidth || canvas.width, this.captureHeight || canvas.height);
+
+					this.screenshot = canvas.toDataURL('image/png');
+				}
+			}
+		});
+	</script>
+</dom-module>

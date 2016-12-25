@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../components/ajp-camera.html">
 <link rel="import" href="../styles/ajp-form-styles.html">
 <link rel="import" href="../styles/ajp-button.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
@@ -15,7 +16,15 @@
 	<template>
 
 		<style include="ajp-form-styles ajp-button ajp-common-styles ajp-input ajp-select paper-dropdown-menu-styles">
+			[responsive-circle] {
+				border-radius: 50%;
+			}
 
+			@media (max-width: 767px) {
+				[responsive-circle] {
+					border-radius: 50%;
+				}
+			}
 		</style>
 
 		<form
@@ -43,9 +52,20 @@
 						</div>
 					</div>
 
+					<!--<div class="row input-row">
+						<div class="column">
+							<ajp-camera id="camera" screenshot="{{screen}}"></ajp-camera id="camera">
+						</div>
+					</div>
+
 					<div class="row input-row">
 						<div class="column">
-							<br>
+							<img class="img-circle" src="{{screen}}" responsive-circle></img>
+						</div>
+					</div>-->
+
+					<div class="row input-row">
+						<div class="column">
 							<br>
 						</div>
 					</div>
@@ -56,7 +76,6 @@
 							<ajp-select>
 								<select id="startTime" name="startTime" required
 									placeholder="Start Time" aria-label="Start Time">
-
 								</select>
 								<ajp-md-decorator aria-hidden="true">
 									<ajp-underline></ajp-underline>
@@ -88,7 +107,6 @@
 					<div class="row input-row">
 						<div class="column">
 							<br>
-							<br>
 						</div>
 					</div>
 
@@ -100,11 +118,11 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="flexchild"></div>
 			</div>
 
 		</form>
-
 
 	</template>
 
