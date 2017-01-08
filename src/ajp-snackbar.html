@@ -68,10 +68,12 @@
 				}
 			},
 
-      open: function() {
+      open: function(hold) {
         Polymer.dom.flush();
         this.offsetHeight && this.classList.add('opened');
-        this.debounce('_close', this.close, 3500);
+				if (!hold) {
+        	this.debounce('_close', this.close, 3500);
+				}
       },
 
       close: function() {

@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../ajp-icons.html">
 <link rel="import" href="../components/ajp-camera.html">
 <link rel="import" href="../styles/ajp-form-styles.html">
 <link rel="import" href="../styles/ajp-button.html">
@@ -10,6 +11,7 @@
 <link rel="import" href="../styles/ajp-input.html">
 <link rel="import" href="../styles/ajp-select.html">
 <link rel="import" href="../styles/paper-dropdown-menu-styles.html">
+
 
 <dom-module id="ajp-event-add">
 
@@ -51,18 +53,6 @@
 							</ajp-input>
 						</div>
 					</div>
-
-					<!--<div class="row input-row">
-						<div class="column">
-							<ajp-camera id="camera" screenshot="{{screen}}"></ajp-camera id="camera">
-						</div>
-					</div>
-
-					<div class="row input-row">
-						<div class="column">
-							<img class="img-circle" src="{{screen}}" responsive-circle></img>
-						</div>
-					</div>-->
 
 					<div class="row input-row">
 						<div class="column">
@@ -112,9 +102,26 @@
 
 					<div class="row input-row">
 						<div class="column">
-							<ajp-button responsive on-click="_add">
-								<a>Add</a>
+							<ajp-button responsive responsive-1 on-click="_startCamera">
+								<a><paper-icon-button icon="camera-enhance" aria-label="Take Pictuer"></paper-icon-button>Take Photo</a>
 							</ajp-button>
+						</div>
+						<div class="column">
+							<ajp-button responsive on-click="_add">
+								<a><paper-icon-button icon="add-circle-outline" aria-label="Add Event"></paper-icon-button>Add Event</a>
+							</ajp-button>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<img class="img-circle" src="{{screen}}" responsive-circle></img>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<br>
 						</div>
 					</div>
 				</div>
@@ -185,6 +192,10 @@
 					};
 					this.fire('Baasbox', {typeFire: 'eventAdd', callbackSuccess:callbackSuccess, callbackFail:callbackFail, title: this.$.eventTitle.value, startTime: this.$.startTime.value, length: this.$.eventLength.value});
 				}
+			},
+
+			_startCamera: function() {
+					this.fire('App', {typeFire: 'showSnack', message: 'Starting Camera. Failed. In Development.', hold: true});
 			},
 
 			_validateForm: function() {

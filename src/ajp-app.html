@@ -189,12 +189,12 @@
 
 			_fireActionApp: function(type) {
 				switch(type) {
-					case 'hideSnack':       this._hideSnack();                            break;
-					case 'populateUserName':this._populateUserName(event.detail.name);    break;
-					case 'progressHide':    this.$.progress.setAttribute("hidden",true);  break;
-					case 'progressShow':    this.$.progress.removeAttribute("hidden");    break;
-					case 'setPage':         this.set('route.path', '/'+event.detail.page);break;
-					case 'showSnack':       this._throwSnack(event.detail.message);       break;
+					case 'hideSnack':       this._hideSnack();                                       break;
+					case 'populateUserName':this._populateUserName(event.detail.name);               break;
+					case 'progressHide':    this.$.progress.setAttribute("hidden",true);             break;
+					case 'progressShow':    this.$.progress.removeAttribute("hidden");               break;
+					case 'setPage':         this.set('route.path', '/'+event.detail.page);           break;
+					case 'showSnack':       this._throwSnack(event.detail.message,event.detail.hold);break;
 					default:console.error('There was no matching function for the app event.', event);
 				}
 			},
@@ -211,7 +211,6 @@
 			},
 
 			_getIronPageValue: function(page) {
-				// TODO: Make 404 page
 				var currentUser = this.$.baasbox.getCurrentUser();
 				this.userDefined = this._isUserDefined(currentUser);
 				if (this.userDefined && (page == "" || !this._isInRegisteredUserPages(page))) {
@@ -313,7 +312,7 @@
 					this.offline =  !navigator.onLine;
 					// Show the snackbar if the user is offline when starting a new session or if the network status changed.
 					message = this.offline ? 'You are offline' : 'You are online';
-					this._throwSnack(message);
+					this._throwSnack(message,false);
 				}
 			},
 
@@ -333,14 +332,14 @@
 				this._announce(e.detail);
 			},
 
-			_throwSnack(message) {
+			_throwSnack(message,hold) {
 				if (!this._networkSnackbar) {
 					this._networkSnackbar = document.createElement('ajp-snackbar');
 					this._networkSnackbar.setAttribute("onClick","this.fire('App', {typeFire: 'hideSnack'})");
 					Polymer.dom(this.root).appendChild(this._networkSnackbar);
 				}
 				Polymer.dom(this._networkSnackbar).innerHTML = message;
-				this._networkSnackbar.open();
+				this._networkSnackbar.open(hold);
 			},
 
 			// A11y announce the given message.
