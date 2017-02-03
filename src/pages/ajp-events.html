@@ -1,4 +1,3 @@
-	<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 	<link rel="import" href="../../bower_components/polymer/polymer.html">
 	<link rel="import" href="../../bower_components/iron-list/iron-list.html">
 	<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
@@ -71,7 +70,7 @@
 					// This fixes speedy page loads and events will overlap each other due to page not setting transform: translate3d correctly.
 					// This will slow it down on the first page load. This is a temporary fix.
 					// Hopefully there will be a fix for this or more resources on why this is happening.
-					time = 1300;
+					time = 600;
 					this.firstTimeEventsLoaded = false;
 				}
 				var that = this;

@@ -11,7 +11,7 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 
-<link rel="import" href="containers/ajp-container-welcome.html">
+<!-- <link rel="import" href="containers/ajp-container-welcome.html"> -->
 <link rel="import" href="containers/ajp-container-main.html">
 <link rel="import" href="containers/ajp-container-authentication.html">
 
@@ -68,7 +68,7 @@
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
 			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
-			<ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome>
+			<!-- <ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome> -->
 		</iron-pages>
 
 		<paper-progress name="progress" id="progress" hidden indeterminate></paper-progress>
@@ -202,7 +202,7 @@
 			_getLayoutValue: function(page) {
 				var value;
 				switch(page) {
-					case 'welcome':value = 'welcome';this.$.welcome.resetSelectedValue();break;
+					//case 'welcome':value = 'welcome';this.$.welcome.resetSelectedValue();break;
 					case 'signon': value = 'authentication';                             break;
 					case 'signup': value = 'authentication';                             break;
 					default:       value = 'main';
@@ -216,7 +216,7 @@
 				if (this.userDefined && (page == "" || !this._isInRegisteredUserPages(page))) {
 					page = 'events';
 				} else if (!this.userDefined && (page == "" || !this._isInUnregisteredUserPages(page))) {
-					if (this.appStorage.welcomed) {
+					if (this.appStorage.welcomed || true) { //////WELCOMED OVERIDE
 						page = 'signon';
 					} else {
 						this.set('appStorage.welcomed', true);
@@ -224,7 +224,7 @@
 					}
 				}
 				this.set('route.path', '/'+page);
-				return page || 'welcome';
+				return page;// || 'welcome';
 			},
 
 			_hideSnack: function() {
