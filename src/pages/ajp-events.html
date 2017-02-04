@@ -82,6 +82,8 @@
 				setTimeout(function(){
 					events.forEach(function(event) {
 						event.currentEventNumber = that.currentEventNumber++;
+						if (that.currentEventNumber == 22)
+							that.currentEventNumber = 0;
 						that.pushEvent(event);
 					});
 					that.turnOffLoadingEvents();

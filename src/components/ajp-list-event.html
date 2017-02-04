@@ -235,13 +235,13 @@
 			},
 
 			ready: function() {
-				// var randomNumber;
-				// randomNumber = Math.floor(Math.random()*21);
-				console.log(this.event.currentEventNumber);
 			},
 
 			_getImageSRC: function(event) {
-				return "../../data/" + event.currentEventNumber + ".jpg";
+				if (event.currentEventNumber)
+					return "../../data/" + event.currentEventNumber + ".jpg";
+				else
+					return "../../data/" + 0 + ".jpg";
 			},
 
 			_formatDateTime: function(date,minutes) {
