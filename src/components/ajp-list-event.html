@@ -23,17 +23,17 @@
 			}
 
 			.eventItem {
-				@apply(--layout-horizontal);
-				min-width: 100%;
 				height: auto;
 				margin: 0 0 32px 0;
+				position: relative;
+				display: box;
 				background-color: white;
 			}
 
 			.eventItem:before{
 				content: "";
 				display: block;
-				padding-top: 100%; 	/* initial ratio of 1:1*/
+				padding-top: 100%; /* initial ratio of 1:1 */
 			}
 
 			.eventItemActions {
@@ -44,13 +44,19 @@
 			}
 
 			.eventItemImage {
-				position: relative;width: 100%;
+				position: static;
+				width: 100%;
 			}
 
 			.eventItemContent {
-				position: absolute;
 				width: 100%;
 				height: 100%;
+
+				position: absolute;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
 			}
 
 			.eventItemContent .eventItemTitle {
@@ -173,8 +179,9 @@
 
 		</style>
 
-		<paper-material class='eventItem box'>
-			<iron-image preload sizing="cover" class="eventItemImage" src="[[image]]"></iron-image>
+
+		<paper-material class='eventItem'>
+			<iron-image preload sizing="cover" class="eventItemImage" src="[[_getImageSRC(event)]]"></iron-image>
 			<div class="eventItemContent">
 				<div class="eventItemTitle">[[event.title]]</div>
 				<div class="eventItemDetails flex-horizontal topMargin">
@@ -224,8 +231,17 @@
 
 				image: {
 					type: String,
-					value: 'https://placeimg.com/640/480/people'
 				}
+			},
+
+			ready: function() {
+				// var randomNumber;
+				// randomNumber = Math.floor(Math.random()*21);
+				console.log(this.event.currentEventNumber);
+			},
+
+			_getImageSRC: function(event) {
+				return "../../data/" + event.currentEventNumber + ".jpg";
 			},
 
 			_formatDateTime: function(date,minutes) {

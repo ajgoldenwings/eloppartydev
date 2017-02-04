@@ -61,6 +61,11 @@
 				firstTimeEventsLoaded: {
 					type: Boolean,
 					value: true
+				},
+
+				currentEventNumber: {
+					type: Number,
+					value: 0
 				}
 			},
 
@@ -76,6 +81,7 @@
 				var that = this;
 				setTimeout(function(){
 					events.forEach(function(event) {
+						event.currentEventNumber = that.currentEventNumber++;
 						that.pushEvent(event);
 					});
 					that.turnOffLoadingEvents();
