@@ -73,11 +73,12 @@
 			},
 
 			eventsPopulate: function(events,isEnd) {
+				var that = this;
 				events.forEach(function(event) {
-					event.currentEventNumber = this.currentEventNumber++;
-					if (this.currentEventNumber == 22)
-						this.currentEventNumber = 0;
-					this.pushEvent(event);
+					event.currentEventNumber = that.currentEventNumber++;
+					if (that.currentEventNumber == 22)
+						that.currentEventNumber = 0;
+					that.pushEvent(event);
 				});
 				this.turnOffLoadingEvents();
 				if (!isEnd) {
