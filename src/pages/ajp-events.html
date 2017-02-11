@@ -21,11 +21,9 @@
 
 		<h2>Event List</h2>
 
-		<iron-list id="list" items="[]" as="event" scroll-target="document">
+		<iron-list id="list" items="[[items]]" as="event" scroll-target="html">
 			<template>
-			<div>
 				<ajp-list-event event=[[event]]></ajp-list-event>
-			</div>
 			</template>
 		</iron-list>
 
@@ -46,6 +44,11 @@
 			is: 'ajp-events',
 
 			properties: {
+				items: {
+					type: Object,
+					value: []
+				},
+
 				page: {
 					type: Number,
 					value: 0,
@@ -70,35 +73,24 @@
 			},
 
 			eventsPopulate: function(events,isEnd) {
-				var time = 0;
-				if (this.firstTimeEventsLoaded) {
-					// This fixes speedy page loads and events will overlap each other due to page not setting transform: translate3d correctly.
-					// This will slow it down on the first page load. This is a temporary fix.
-					// Hopefully there will be a fix for this or more resources on why this is happening.
-					time = 600;
-					this.firstTimeEventsLoaded = false;
+				events.forEach(function(event) {
+					event.currentEventNumber = this.currentEventNumber++;
+					if (this.currentEventNumber == 22)
+						this.currentEventNumber = 0;
+					this.pushEvent(event);
+				});
+				this.turnOffLoadingEvents();
+				if (!isEnd) {
+					this.$.scrollTheshold.clearTriggers();
 				}
-				var that = this;
-				setTimeout(function(){
-					events.forEach(function(event) {
-						event.currentEventNumber = that.currentEventNumber++;
-						if (that.currentEventNumber == 22)
-							that.currentEventNumber = 0;
-						that.pushEvent(event);
-					});
-					that.turnOffLoadingEvents();
-					if (!isEnd) {
-						that.$.scrollTheshold.clearTriggers();
-					}
-				}, time);
 			},
 
 			pushEvent: function(event) {
-				this.$.list.push('items', event);
+				this.push('items', event);
 			},
 
 			unshiftEvent: function(event) {
-				this.$.list.unshift('items', event);
+				this.unshift('items', event);
 			},
 
 			turnOffLoadingEvents: function() {

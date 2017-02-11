@@ -165,6 +165,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					background: white;
 				}
 			}
+
+			@media (min-width: 768px) {
+				.flex-horizontal-with-ratios {
+					@apply(--layout-horizontal);
+				}
+				.flexchild {
+					@apply(--layout-flex);
+				}
+				.flex3child {
+					@apply(--layout-flex-3);
+				}
+			}
 		</style>
 	</template>
 </dom-module>
