@@ -195,7 +195,23 @@
 			},
 
 			_startCamera: function() {
-					this.fire('App', {typeFire: 'showSnack', message: 'Starting Camera. Failed. In Development.', hold: true});
+				var messageHtml = "";
+				var fireAction = "hideSnack";
+
+				navigator.getUserMedia = (navigator.getUserMedia ||
+					navigator.webkitGetUserMedia ||
+					navigator.mozGetUserMedia ||
+					navigator.msGetUserMedia);
+
+				if (navigator.getUserMedia) {
+					messageHtml = "Click here to allow access to your devices camera?";
+					fireAction = "allowAccessToCamera";
+				} else {
+					console.log('Browser does not support getUserMedia');
+					messageHtml = "We did not find a camera on your device. Sorry.";
+				}
+
+				this.fire('App', {typeFire: 'showSnack', message: messageHtml, hold: false, fireAction: fireAction});
 			},
 
 			_validateForm: function() {

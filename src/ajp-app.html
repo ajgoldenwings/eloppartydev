@@ -16,7 +16,7 @@
 <link rel="import" href="containers/ajp-container-authentication.html">
 
 <link rel="import" href="ajp-baasbox.html">
-<link rel="import" href="ajp-toolbar.html">
+<link rel="import" href="components/ajp-toolbar.html">
 
 <dom-module id="ajp-app">
 	<template>
@@ -87,6 +87,10 @@
 
 			properties: {
 				baasbox: {
+					type: Object
+				},
+
+				MediaStream: {
 					type: Object
 				},
 
@@ -189,12 +193,14 @@
 
 			_fireActionApp: function(type) {
 				switch(type) {
-					case 'hideSnack':       this._hideSnack();                                       break;
-					case 'populateUserName':this._populateUserName(event.detail.name);               break;
-					case 'progressHide':    this.$.progress.setAttribute("hidden",true);             break;
-					case 'progressShow':    this.$.progress.removeAttribute("hidden");               break;
-					case 'setPage':         this.set('route.path', '/'+event.detail.page);           break;
-					case 'showSnack':       this._throwSnack(event.detail.message,event.detail.hold);break;
+					case 'allowAccessToCamera':this._allowAccessToCamera();                                                    break;
+					case 'hideSnack':         this._hideSnack();                                                               break;
+					case 'populateUserName':  this._populateUserName(event.detail.name);                                       break;
+					case 'progressHide':      this.$.progress.setAttribute("hidden",true);                                     break;
+					case 'progressShow':      this.$.progress.removeAttribute("hidden");                                       break;
+					case '_turnOffCamera':    this._turnOffCamera();                                                           break;
+					case 'setPage':           this.set('route.path', '/'+event.detail.page);                                   break;
+					case 'showSnack':         this._throwSnack(event.detail.message,event.detail.hold,event.detail.fireAction);break;
 					default:console.error('There was no matching function for the app event.', event);
 				}
 			},
@@ -228,6 +234,19 @@
 				return page;// || 'welcome';
 			},
 
+			_allowAccessToCamera: function() {
+				var that = this;
+				navigator.getUserMedia({video: true},
+					function(localMediaStream) {
+						that.fire('App', {typeFire: 'showSnack', message: 'Accessing the camera is available and ready however we are still in development.'});
+						that.MediaStream = stream.getTracks()[0]; // create the stream tracker
+					},function(err) {
+						console.log('The following error occurred when trying to use getUserMedia: ' + err);
+						that.fire('App', {typeFire: 'showSnack', message: 'Error accessing media device.'});
+					}
+				);
+			},
+
 			_hideSnack: function() {
 				this._networkSnackbar.close();
 			},
@@ -250,6 +269,10 @@
 					name = currentUser && currentUser.username || "Your Username";
 				}
 				this._setUserName(name);
+			},
+
+			_turnOffCamera: function() {
+				this.MediaStream.stop();
 			},
 
 			_setUserName: function(name) {
@@ -333,10 +356,12 @@
 				this._announce(e.detail);
 			},
 
-			_throwSnack(message,hold) {
+			_throwSnack(message,hold,fireAction) {
+				fireAction = (typeof fireAction === 'undefined') ? 'hideSnack' : fireAction;
+				hold = (typeof hold === 'undefined') ? false : hold;
 				if (!this._networkSnackbar) {
 					this._networkSnackbar = document.createElement('ajp-snackbar');
-					this._networkSnackbar.setAttribute("onClick","this.fire('App', {typeFire: 'hideSnack'})");
+					this._networkSnackbar.setAttribute("onClick","this.fire('App', {typeFire: '"+fireAction+"'})");
 					Polymer.dom(this.root).appendChild(this._networkSnackbar);
 				}
 				Polymer.dom(this._networkSnackbar).innerHTML = message;
