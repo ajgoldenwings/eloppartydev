@@ -5,11 +5,13 @@
 <link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+
 
 <!-- <link rel="import" href="containers/ajp-container-welcome.html"> -->
 <link rel="import" href="containers/ajp-container-main.html">
@@ -60,13 +62,14 @@
 		</style>
 
 		<ajp-baasbox id="baasbox" name="baasbox"></ajp-baasbox>
-		<iron-localstorage name="ajp-app-storage" value="{{appStorage}}" on-iron-localstorage-load-empty="initializeDefaultAppStorage"></iron-localstorage>
+
+		<app-localstorage-document key="appStorage" data="{{appStorage}}"></app-localstorage-document>
 
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
+			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" app-storage="[[appStorage]]" user-name="[[userName]]">Loading...</ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
 			<!-- <ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome> -->
 		</iron-pages>
@@ -79,7 +82,7 @@
 
 	<script>
 		// performance logging
-		//window.performance && performance.mark && performance.mark('ajp-app - before register');
+		// window.performance && performance.mark && performance.mark('ajp-app - before register');
 
 		Polymer({
 
@@ -90,7 +93,7 @@
 					type: Object
 				},
 
-				MediaStream: {
+				mediaStream: {
 					type: Object
 				},
 
@@ -137,9 +140,19 @@
 				},
 
 				appStorage: {
-					type: Object
-				}
+					type: Object,
+					value: function() {
+						return {};
+					}
+				},
 
+				zeroValue: {
+					type: Object,
+					value: {
+						welcomed: false,
+						allowedCamera: false
+					}
+				},
 			},
 
 			observers: [
@@ -156,12 +169,6 @@
 				window.performance && performance.mark && performance.mark('ajp-app.created');
 				// Custom elements polyfill safe way to indicate an element has been upgraded.
 				this.removeAttribute('unresolved');
-			},
-
-			initializeDefaultAppStorage: function(ev) {
-				this.appStorage = {
-					welcomed: false
-				}
 			},
 
 			ready: function() {
@@ -191,16 +198,17 @@
 				}
 			},
 
-			_fireActionApp: function(type) {
+			_fireActionApp: function(type, detail) {
 				switch(type) {
 					case 'allowAccessToCamera':this._allowAccessToCamera();                                                    break;
 					case 'hideSnack':         this._hideSnack();                                                               break;
-					case 'populateUserName':  this._populateUserName(event.detail.name);                                       break;
+					case 'populateUserName':  this._populateUserName(detail.name);                                             break;
 					case 'progressHide':      this.$.progress.setAttribute("hidden",true);                                     break;
 					case 'progressShow':      this.$.progress.removeAttribute("hidden");                                       break;
-					case '_turnOffCamera':    this._turnOffCamera();                                                           break;
-					case 'setPage':           this.set('route.path', '/'+event.detail.page);                                   break;
-					case 'showSnack':         this._throwSnack(event.detail.message,event.detail.hold,event.detail.fireAction);break;
+					case 'turnOffCamera':     this._turnOffCamera();                                                           break;
+					case 'turnOnCamera':      this._turnOnCamera();                                                            break;
+					case 'setPage':           this.set('route.path', '/'+detail.page);                                         break;
+					case 'showSnack':         this._throwSnack(detail.message,detail.hold,detail.fireAction,detail.fireFinaly);break;
 					default:console.error('There was no matching function for the app event.', event);
 				}
 			},
@@ -209,8 +217,8 @@
 				var value;
 				switch(page) {
 					//case 'welcome':value = 'welcome';this.$.welcome.resetSelectedValue();break;
-					case 'signon': value = 'authentication';                             break;
-					case 'signup': value = 'authentication';                             break;
+					case 'signon': value = 'authentication';break;
+					case 'signup': value = 'authentication';break;
 					default:       value = 'main';
 				}
 				return value;
@@ -222,13 +230,13 @@
 				if (this.userDefined && (page == "" || !this._isInRegisteredUserPages(page))) {
 					page = 'events';
 				} else if (!this.userDefined && (page == "" || !this._isInUnregisteredUserPages(page))) {
-					if (this.appStorage.welcomed || true) { //////WELCOMED OVERIDE
-						page = 'signon';
-					} else {
-						this.set('appStorage.welcomed', true);
-						page = 'signon';
-						//page = 'welcome';
-					}
+					// if (this.appStorage.welcomed || true) { //////WELCOMED OVERIDE
+					 	page = 'signon';
+					// } else {
+					// 	this.set('appStorage.welcomed', true);
+					// 	page = 'signon';
+					// 	//page = 'welcome';
+					// }
 				}
 				this.set('route.path', '/'+page);
 				return page;// || 'welcome';
@@ -238,9 +246,10 @@
 				var that = this;
 				navigator.getUserMedia({video: true},
 					function(localMediaStream) {
-						that.fire('App', {typeFire: 'showSnack', message: 'Accessing the camera is available and ready however we are still in development.'});
-						that.MediaStream = stream.getTracks()[0]; // create the stream tracker
-					},function(err) {
+						that.mediaStream = localMediaStream;
+						that.set('appStorage.allowedCamera', true);
+						that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video><br><button id="snap">Snap Photo</button>', fireAction: "turnOffCamera", fireFinaly: "turnOnCamera"});
+					}, function(err) {
 						console.log('The following error occurred when trying to use getUserMedia: ' + err);
 						that.fire('App', {typeFire: 'showSnack', message: 'Error accessing media device.'});
 					}
@@ -248,6 +257,7 @@
 			},
 
 			_hideSnack: function() {
+				this._networkSnackbar.setAttribute("onClick","");
 				this._networkSnackbar.close();
 			},
 
@@ -271,8 +281,45 @@
 				this._setUserName(name);
 			},
 
+			_turnOnCamera: function() {
+				var video = Polymer.dom(this._networkSnackbar).querySelector('video');
+				window.stream = this.mediaStream; // make stream available to console
+				video.src = window.URL.createObjectURL(stream);
+				video.play();
+
+				// var that = this;
+
+				// function errorCallback(error) {console.log('navigator.getUserMedia error: ', error);}
+
+
+				// function successCallback(stream) {
+				// 	window.stream = stream; // make stream available to console
+				// 	video.src = window.URL.createObjectURL(stream);
+				// 	video.play();
+				// }
+
+
+				// function start() {
+				// 	var constraints = {
+				// 		video: {
+				// 			mandatory: {
+				// 				minWidth: 400,
+				// 				minHeight: 400,
+				// 				maxWidth: 400,
+				// 				maxHeight: 400
+				// 			}
+				// 		}
+				// 	};
+				// 	navigator.getUserMedia(constraints, successCallback, errorCallback);
+				// }
+
+				// start();
+			},
+
 			_turnOffCamera: function() {
-				this.MediaStream.stop();
+				var track = stream.getTracks()[0];
+				console.log(track);
+				track.stop();
 			},
 
 			_setUserName: function(name) {
@@ -356,16 +403,20 @@
 				this._announce(e.detail);
 			},
 
-			_throwSnack(message,hold,fireAction) {
-				fireAction = (typeof fireAction === 'undefined') ? 'hideSnack' : fireAction;
+			_throwSnack(message,hold,fireAction,fireFinaly) {
+				fireAction = ((typeof fireAction === 'undefined') ? "" : "this.fire('App', {typeFire: '"+fireAction+"'});");
+				fireAction += "this.fire('App',{typeFire:'hideSnack'});"
 				hold = (typeof hold === 'undefined') ? false : hold;
 				if (!this._networkSnackbar) {
 					this._networkSnackbar = document.createElement('ajp-snackbar');
-					this._networkSnackbar.setAttribute("onClick","this.fire('App', {typeFire: '"+fireAction+"'})");
 					Polymer.dom(this.root).appendChild(this._networkSnackbar);
 				}
+				Polymer.dom(this._networkSnackbar).setAttribute("onClick",fireAction);
 				Polymer.dom(this._networkSnackbar).innerHTML = message;
 				this._networkSnackbar.open(hold);
+				if (fireFinaly !== undefined) {
+					this.fire('App', {typeFire: fireFinaly});
+				}
 			},
 
 			// A11y announce the given message.

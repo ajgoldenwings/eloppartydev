@@ -29,6 +29,14 @@
 			}
 		</style>
 
+<style>
+.demo-frame header, .demo-frame h1, .demo-frame .demo-conversion {display: none;}
+.demo-wrapper {min-height: 500px;}
+.bsap {position: absolute;top: 0;right: 0;}
+video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
+#canvas { margin-top: 20px; border: 1px solid #ccc; display: block; }
+</style>
+
 		<form
 			id="addEventForm"
 			is="iron-form"
@@ -106,6 +114,7 @@
 								<a><paper-icon-button icon="camera-enhance" aria-label="Take Pictuer"></paper-icon-button>Take Photo</a>
 							</ajp-button>
 						</div>
+
 						<div class="column">
 							<ajp-button responsive on-click="_add">
 								<a><paper-icon-button icon="add-circle-outline" aria-label="Add Event"></paper-icon-button>Add Event</a>
@@ -133,6 +142,8 @@
 
 	</template>
 
+
+
 	<script>
 
 		Polymer({
@@ -140,7 +151,9 @@
 			is: 'ajp-event-add',
 
 			properties: {
-
+				appStorage: {
+					type: Object
+				}
 			},
 
 			clearForm: function() {
@@ -203,15 +216,19 @@
 					navigator.mozGetUserMedia ||
 					navigator.msGetUserMedia);
 
-				if (navigator.getUserMedia) {
-					messageHtml = "Click here to allow access to your devices camera?";
-					fireAction = "allowAccessToCamera";
-				} else {
-					console.log('Browser does not support getUserMedia');
-					messageHtml = "We did not find a camera on your device. Sorry.";
-				}
+				if (this.appStorage.allowedCamera === undefined || this.appStorage.allowedCamera == false) {
+					if (navigator.getUserMedia) {
+						messageHtml = "Click here to allow access to your devices camera?";
+						fireAction = "allowAccessToCamera";
+					} else {
+						console.log('Browser does not support getUserMedia');
+						messageHtml = "We did not find a camera on your device. Sorry.";
+					}
 
-				this.fire('App', {typeFire: 'showSnack', message: messageHtml, hold: false, fireAction: fireAction});
+					this.fire('App', {typeFire: 'showSnack', message: messageHtml, hold: false, fireAction: fireAction});
+				} else {
+					this.fire('App', {typeFire: 'allowAccessToCamera'});
+				}
 			},
 
 			_validateForm: function() {
