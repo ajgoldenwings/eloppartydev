@@ -1,11 +1,11 @@
-	<link rel="import" href="../../bower_components/polymer/polymer.html">
-	<link rel="import" href="../../bower_components/iron-list/iron-list.html">
-	<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
-	<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-	<link rel="import" href="../styles/ajp-common-styles.html">
-	<link rel="import" href="../components/ajp-list-event.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../styles/ajp-common-styles.html">
+<link rel="import" href="../components/ajp-list-event.html">
 
-	<dom-module id="ajp-events">
+<dom-module id="ajp-events">
 
 	<template id="overlay">
 
@@ -21,19 +21,16 @@
 
 		<h2>Event List</h2>
 
-		<iron-list id="list" items="[[items]]" as="event" scroll-target="html">
-			<template>
-				<ajp-list-event event=[[event]]></ajp-list-event>
-			</template>
-		</iron-list>
-
-		<paper-spinner active="{{loadingEvents}}"></paper-spinner>
-
 		<iron-scroll-threshold id="scrollTheshold"
 			lower-threshold="500"
 			on-lower-threshold="_loadMoreData"
 			scroll-target="document">
+			<template is="dom-repeat" items="[[items]]" as="event">
+				 <ajp-list-event event=[[event]]></ajp-list-event>
+			</template>
 		</iron-scroll-threshold>
+
+		<paper-spinner active="{{loadingEvents}}"></paper-spinner>
 
 	</template>
 
@@ -73,13 +70,15 @@
 			},
 
 			eventsPopulate: function(events,isEnd) {
-				var that = this;
-				events.forEach(function(event) {
-					event.currentEventNumber = that.currentEventNumber++;
-					if (that.currentEventNumber == 22)
-						that.currentEventNumber = 0;
-					that.pushEvent(event);
-				});
+				var eventsLength = events.length;
+
+				for (var i = 0; i < eventsLength; i++) {
+					events[i].currentEventNumber = this.currentEventNumber++;
+					if (this.currentEventNumber == 22)
+						this.currentEventNumber = 0;
+					this.pushEvent(events[i]);
+				}
+
 				this.turnOffLoadingEvents();
 				if (!isEnd) {
 					this.$.scrollTheshold.clearTriggers();

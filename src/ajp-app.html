@@ -244,7 +244,17 @@
 
 			_allowAccessToCamera: function() {
 				var that = this;
-				navigator.getUserMedia({video: true},
+				navigator.getUserMedia(
+					{
+						video: {
+				 			mandatory: {
+				 				minWidth: 400,
+				 				minHeight: 400,
+				 				maxWidth: 400,
+				 				maxHeight: 400
+				 			}
+				 		}
+					},
 					function(localMediaStream) {
 						that.mediaStream = localMediaStream;
 						that.set('appStorage.allowedCamera', true);
@@ -318,7 +328,6 @@
 
 			_turnOffCamera: function() {
 				var track = stream.getTracks()[0];
-				console.log(track);
 				track.stop();
 			},
 
