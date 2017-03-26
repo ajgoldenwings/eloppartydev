@@ -72,7 +72,9 @@
 			Polymer.dom.flush();
 			this.offsetHeight && this.classList.add('opened');
 			if (!hold) {
-				this.debounce('_close', this.close, 3500);
+				this.debounce('_close', this.close, 3500); // Good idea. Have this be a variable for in app notification length.
+			} else {
+				this.cancelDebouncer('_close');
 			}
 		},
 

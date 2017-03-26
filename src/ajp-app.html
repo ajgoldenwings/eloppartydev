@@ -19,6 +19,7 @@
 
 <link rel="import" href="ajp-baasbox.html">
 <link rel="import" href="components/ajp-toolbar.html">
+<link rel="import" href="components/ajp-media-stream.html">
 
 <dom-module id="ajp-app">
 	<template>
@@ -65,11 +66,13 @@
 
 		<app-localstorage-document key="appStorage" data="{{appStorage}}"></app-localstorage-document>
 
+		<ajp-media-stream id="media" name="media" media-stream="{{mediaStream}}" app-storage="[[appStorage]]"></ajp-media-stream>
+
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" app-storage="[[appStorage]]" user-name="[[userName]]">Loading...</ajp-container-main>
+			<ajp-container-main name="main" id="main" media-stream="{{mediaStream}}" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" app-storage="[[appStorage]]" user-name="[[userName]]">Loading...</ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
 			<!-- <ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome> -->
 		</iron-pages>
@@ -89,12 +92,9 @@
 			is: 'ajp-app',
 
 			properties: {
-				baasbox: {
-					type: Object
-				},
-
 				mediaStream: {
-					type: Object
+					type: Object,
+					reflectToAttribute: true
 				},
 
 				page: {
@@ -182,8 +182,8 @@
 				this.addEventListener('Authentication',this._fireAction);
 				this.addEventListener('Baasbox',       this._fireAction);
 				this.addEventListener('Main',          this._fireAction);
+				this.addEventListener('Media',         this._fireAction);
 
-				this.baasbox = this.$.baasbox;
 
 				this._populateUserName();
 			},
@@ -192,24 +192,24 @@
 				switch(event.type) {
 					case 'App':           this._fireActionApp(       event.detail.typeFire, event.detail);break;
 					case 'Authentication':this.$.authentication.fire(event.detail.typeFire, event.detail);break;
-					case 'Baasbox':       this.baasbox.fire(         event.detail.typeFire, event.detail);break;
+					case 'Baasbox':       this.$.baasbox.fire(       event.detail.typeFire, event.detail);break;
 					case 'Main':          this.$.main.fire(          event.detail.typeFire, event.detail);break;
+					case 'Media':         this.$.media.fire(         event.detail.typeFire, event.detail);break;
 					default:console.error('There was no matching details for the event that was listened by the app.', event);
 				}
 			},
 
 			_fireActionApp: function(type, detail) {
 				switch(type) {
-					case 'allowAccessToCamera':this._allowAccessToCamera();                                                    break;
-					case 'hideSnack':         this._hideSnack();                                                               break;
-					case 'populateUserName':  this._populateUserName(detail.name);                                             break;
-					case 'progressHide':      this.$.progress.setAttribute("hidden",true);                                     break;
-					case 'progressShow':      this.$.progress.removeAttribute("hidden");                                       break;
-					case 'turnOffCamera':     this._turnOffCamera();                                                           break;
-					case 'turnOnCamera':      this._turnOnCamera();                                                            break;
-					case 'setPage':           this.set('route.path', '/'+detail.page);                                         break;
-					case 'showSnack':         this._throwSnack(detail.message,detail.hold,detail.fireAction,detail.fireFinaly);break;
-					default:console.error('There was no matching function for the app event.', event);
+					//case 'allowAccessToCamera':this._allowAccessToCamera();                                               break;
+					case 'hideSnack':         this._hideSnack();                                                            break;
+					case 'mainAppFire':       this._mainAppFire(detail.fire,detail.details);                                break;
+					case 'populateUserName':  this._populateUserName(detail.name);                                          break;
+					case 'progressHide':      this.$.progress.setAttribute("hidden",true);                                  break;
+					case 'progressShow':      this.$.progress.removeAttribute("hidden");                                    break;
+					case 'setPage':           this.set('route.path', '/'+detail.page);                                      break;
+					case 'showSnack':         this._throwSnack(detail.message,detail.hold,detail.onClick,detail.fireFinaly);break;
+					default:console.error('There was no matching function for the app event.', type);
 				}
 			},
 
@@ -242,29 +242,33 @@
 				return page;// || 'welcome';
 			},
 
-			_allowAccessToCamera: function() {
-				var that = this;
-				navigator.getUserMedia(
-					{
-						video: {
-				 			mandatory: {
-				 				minWidth: 400,
-				 				minHeight: 400,
-				 				maxWidth: 400,
-				 				maxHeight: 400
-				 			}
-				 		}
-					},
-					function(localMediaStream) {
-						that.mediaStream = localMediaStream;
-						that.set('appStorage.allowedCamera', true);
-						that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video><br><button id="snap">Snap Photo</button>', fireAction: "turnOffCamera", fireFinaly: "turnOnCamera"});
-					}, function(err) {
-						console.log('The following error occurred when trying to use getUserMedia: ' + err);
-						that.fire('App', {typeFire: 'showSnack', message: 'Error accessing media device.'});
-					}
-				);
-			},
+			// _allowAccessToCamera: function() {
+			// 	var that = this;
+			// 	navigator.getUserMedia(
+			// 		{
+			// 			video: {
+			// 	 			mandatory: {
+			// 	 				minWidth: 400,
+			// 	 				minHeight: 400,
+			// 	 				maxWidth: 400,
+			// 	 				maxHeight: 400
+			// 	 			}
+			// 	 		}
+			// 		},
+			// 		function(localMediaStream) {
+			// 			that.mediaStream = localMediaStream;
+			// 			//that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
+			// 			that.set('appStorage.allowedCamera', true);
+			// 			var onClick = function() {
+			// 				this.fire('App', {typeFire: 'turnOffCamera'})
+			// 			};
+			// 			that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video><br><button id="snap">Snap Photo</button>', onClick: onClick, fireFinaly: "turnOnCamera"});
+			// 		}, function(err) {
+			// 			console.log('The following error occurred when trying to use getUserMedia: ' + err);
+			// 			that.fire('App', {typeFire: 'showSnack', message: 'Error accessing media device.'});
+			// 		}
+			// 	);
+			// },
 
 			_hideSnack: function() {
 				this._networkSnackbar.setAttribute("onClick","");
@@ -285,50 +289,10 @@
 
 			_populateUserName: function(name) {
 				if (name === undefined && this.userName == "Your Username") {
-					var currentUser = this.baasbox.getCurrentUser();
+					var currentUser = this.$.baasbox.getCurrentUser();
 					name = currentUser && currentUser.username || "Your Username";
 				}
 				this._setUserName(name);
-			},
-
-			_turnOnCamera: function() {
-				var video = Polymer.dom(this._networkSnackbar).querySelector('video');
-				window.stream = this.mediaStream; // make stream available to console
-				video.src = window.URL.createObjectURL(stream);
-				video.play();
-
-				// var that = this;
-
-				// function errorCallback(error) {console.log('navigator.getUserMedia error: ', error);}
-
-
-				// function successCallback(stream) {
-				// 	window.stream = stream; // make stream available to console
-				// 	video.src = window.URL.createObjectURL(stream);
-				// 	video.play();
-				// }
-
-
-				// function start() {
-				// 	var constraints = {
-				// 		video: {
-				// 			mandatory: {
-				// 				minWidth: 400,
-				// 				minHeight: 400,
-				// 				maxWidth: 400,
-				// 				maxHeight: 400
-				// 			}
-				// 		}
-				// 	};
-				// 	navigator.getUserMedia(constraints, successCallback, errorCallback);
-				// }
-
-				// start();
-			},
-
-			_turnOffCamera: function() {
-				var track = stream.getTracks()[0];
-				track.stop();
 			},
 
 			_setUserName: function(name) {
@@ -346,6 +310,11 @@
 					// Close the drawer - in case the *route* change came from a link in the drawer.
 					// this.drawerOpened = false;
 				});
+			},
+
+			_mainAppFire: function(fire,details) {
+				var that = this;
+				fire(that,details);
 			},
 
 			_pageChanged: function(page, oldPage) {
@@ -412,19 +381,19 @@
 				this._announce(e.detail);
 			},
 
-			_throwSnack(message,hold,fireAction,fireFinaly) {
-				fireAction = ((typeof fireAction === 'undefined') ? "" : "this.fire('App', {typeFire: '"+fireAction+"'});");
-				fireAction += "this.fire('App',{typeFire:'hideSnack'});"
+			_throwSnack(message,hold,onClick,fireFinaly) {
+				onClick = ((typeof onClick === 'undefined') ? "" : onClick + ";");
+				onClick += "this.fire('App',{typeFire:'hideSnack'});"
 				hold = (typeof hold === 'undefined') ? false : hold;
 				if (!this._networkSnackbar) {
 					this._networkSnackbar = document.createElement('ajp-snackbar');
 					Polymer.dom(this.root).appendChild(this._networkSnackbar);
 				}
-				Polymer.dom(this._networkSnackbar).setAttribute("onClick",fireAction);
+				Polymer.dom(this._networkSnackbar).setAttribute("onClick",onClick);
 				Polymer.dom(this._networkSnackbar).innerHTML = message;
 				this._networkSnackbar.open(hold);
 				if (fireFinaly !== undefined) {
-					this.fire('App', {typeFire: fireFinaly});
+					fireFinaly();
 				}
 			},
 

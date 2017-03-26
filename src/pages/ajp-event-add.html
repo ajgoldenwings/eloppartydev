@@ -151,6 +151,11 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 			properties: {
 				appStorage: {
 					type: Object
+				},
+
+				mediaStream: {
+					type: Object,
+					reflectToAttribute: true
 				}
 			},
 
@@ -160,6 +165,23 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 
 			ready: function() {
 				this._generateTimes();
+			},
+
+			startCameraPermission: function() {
+				var that = this;
+				var callbackNeedUserPermissionSuccess = function (localMediaStream) {
+					that.mediaStream = localMediaStream;
+					that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
+					//						that.set('appStorage.allowedCamera', true);
+					var onClickEventCall = "this.fire('Main', {typeFire: 'turnOffCamera'}); ";
+					var fireFinaly = function () {that.fire('Main', {typeFire: 'turnOnCamera'})};
+					that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video>', onClick: onClickEventCall, fireFinaly: fireFinaly});
+				};
+				var callbackNeedUserPermissionFail = function (err) {
+					console.log('The following error occurred when trying to use getUserMedia: ' + err);
+					that.fire('App', {typeFire: 'showSnack', message: 'Was not able to access media device.'});
+				};
+				this.fire('Media', {typeFire: 'allowAccessToCamera', callbackNeedUserPermissionSuccess: callbackNeedUserPermissionSuccess, callbackNeedUserPermissionFail: callbackNeedUserPermissionFail});
 			},
 
 			_generateTimes: function() {
@@ -189,44 +211,78 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 			_add: function() {
 				if (this._validateForm()) {
 					this.fire('App', {typeFire: 'progressShow'});
+
 					var that = this;
+
 					var callbackFail = function () {
 						that.fire('App', {typeFire: 'showSnack', message: 'Failed to add event.'});
 						that.fire('App', {typeFire: 'progressHide'});
 						that.fire('App', {typeFire: 'setPage', page: ''});
 					};
+
 					var callbackSuccess = function (event) {
 						that.fire('App', {typeFire: 'showSnack', message: 'Your event was added.'});
 						that.fire('Main', {typeFire: 'unshiftEvent', event: event});
 						that.fire('App', {typeFire: 'progressHide'});
 						that.fire('App', {typeFire: 'setPage', page: ''});
 					};
+
 					this.fire('Baasbox', {typeFire: 'eventAdd', callbackSuccess:callbackSuccess, callbackFail:callbackFail, title: this.$.eventTitle.value, startTime: this.$.startTime.value, length: this.$.eventLength.value});
 				}
 			},
 
 			_startCamera: function() {
-				var messageHtml = "";
-				var fireAction = "hideSnack";
+				var that = this;
+				var callbackFail = function () {
+					that.fire('App', {typeFire: 'showSnack', message: 'We did not find a camera on your device. Sorry.'});
+				};
+				var callbackSuccess = function () {
+					that.fire('App', {typeFire: 'allowAccessToCamera'});
+				};
 
-				navigator.getUserMedia = (navigator.getUserMedia ||
-					navigator.webkitGetUserMedia ||
-					navigator.mozGetUserMedia ||
-					navigator.msGetUserMedia);
+				var callbackNeedUserPermission = function () {
+					var onClickEventCall = "this.fire('Main', {typeFire: 'startCameraPermission'});";
+					that.fire('App', {typeFire: 'showSnack', message: 'Click here to allow access to your device\'s camera.', hold: false, onClick: onClickEventCall});
+				};
 
-				if (this.appStorage.allowedCamera === undefined || this.appStorage.allowedCamera == false) {
-					if (navigator.getUserMedia) {
-						messageHtml = "Click here to allow access to your devices camera?";
-						fireAction = "allowAccessToCamera";
-					} else {
-						console.log('Browser does not support getUserMedia');
-						messageHtml = "We did not find a camera on your device. Sorry.";
-					}
+				this.fire('Media', {typeFire: 'startCamera',callbackSuccess: callbackSuccess, callbackFail: callbackFail, callbackNeedUserPermission: callbackNeedUserPermission});
 
-					this.fire('App', {typeFire: 'showSnack', message: messageHtml, hold: false, fireAction: fireAction});
-				} else {
-					this.fire('App', {typeFire: 'allowAccessToCamera'});
-				}
+				// var messageHtml = "";
+				// var onClick = "hideSnack";
+
+				// navigator.getUserMedia = (navigator.getUserMedia ||
+				// 	navigator.webkitGetUserMedia ||
+				// 	navigator.mozGetUserMedia ||
+				// 	navigator.msGetUserMedia);
+
+				// if (this.appStorage.allowedCamera === undefined || this.appStorage.allowedCamera == false) {
+				// 	if (navigator.getUserMedia) {
+				// 		messageHtml = "Click here to allow access to your devices camera.";
+				// 		onClick = "allowAccessToCamera";
+				// 	} else {
+				// 		console.log('Browser does not support getUserMedia');
+				// 		messageHtml = "We did not find a camera on your device. Sorry.";
+				// 	}
+
+				// 	this.fire('App', {typeFire: 'showSnack', message: messageHtml, hold: false, onClick: onClick});
+				// } else {
+				// 	this.fire('App', {typeFire: 'allowAccessToCamera'});
+				// }
+			},
+
+			turnOnCamera: function() {
+				var fire = function (that,details) {
+					var video = Polymer.dom(that._networkSnackbar).querySelector('video');
+					window.stream = details; /*make stream available to console*/;
+					video.src = window.URL.createObjectURL(stream);
+					video.play();
+				};
+				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.mediaStream});
+			},
+
+			turnOffCamera: function() {
+				var track = stream.getTracks()[0];
+				track.stop();
 			},
 
 			_validateForm: function() {

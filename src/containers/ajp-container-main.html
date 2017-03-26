@@ -34,32 +34,11 @@
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-		<!--<link rel="import" href="../../bower_components/paper-item/paper-item.html">
-		<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
-		<div id="notifications">
-			<h2>Notifications</h2>
-
-			<div role="listbox">
-				<paper-item class="border-bottom">
-					<paper-item-body two-line>
-						<div>Allow access to the Camera</div>
-						<div secondary>Allow Access to take pictures of events.</div>
-					</paper-item-body>
-				</paper-item>
-				<paper-item class="border-bottom">
-					<paper-item-body two-line>
-						<div>Allow access to the GPS</div>
-						<div secondary>Allow Access to get the location of the events.</div>
-					</paper-item-body>
-				</paper-item>
-			</div>
-		</div>-->
-
 		<div class="flex-horizontal-with-ratios">
 			<div class="flexchild"></div>
 			<div class="flex3child">
 				<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-					<ajp-event-add name="event-add" app-storage="[[appStorage]]"><paper-spinner active></paper-spinner></ajp-event-add>
+					<ajp-event-add name="event-add" id="eventadd" app-storage="[[appStorage]]" media-stream="{{mediaStream}}"><paper-spinner active></paper-spinner></ajp-event-add>
 					<ajp-action name="action"><paper-spinner active></paper-spinner></ajp-action>
 					<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"><paper-spinner active></paper-spinner></ajp-change-password-current>
 					<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"><paper-spinner active></paper-spinner></ajp-change-password-confirm>
@@ -91,6 +70,11 @@
 
 				baasbox: {
 					type: Object
+				},
+
+				mediaStream: {
+					type: Object,
+					reflectToAttribute: true
 				},
 
 				page: {
@@ -127,7 +111,10 @@
 				this.addEventListener('passwordReady',            this._fireAction);
 				this.addEventListener('passwordNewSetToConfirm',  this._fireAction);
 				this.addEventListener('passwordStoreCurrent',     this._fireAction);
+				this.addEventListener('startCameraPermission',    this._fireAction);
 				this.addEventListener('turnOffLoadingEvents',     this._fireAction);
+				this.addEventListener('turnOffCamera',            this._fireAction);
+				this.addEventListener('turnOnCamera',             this._fireAction);
 				this.addEventListener('unshiftEvent',             this._fireAction);
 			},
 
@@ -141,6 +128,9 @@
 					case 'passwordReady':            this._passwordReady();                                               break;
 					case 'passwordNewSetToConfirm':  this._passwordNewSetToConfirm(event.detail.password);                break;
 					case 'passwordStoreCurrent':     this.passwordStoreCurrent(event.detail.password);                    break;
+					case 'startCameraPermission':    this.$.eventadd.startCameraPermission();                             break;
+					case 'turnOffCamera':            this.$.eventadd.turnOffCamera();                                     break;
+					case 'turnOnCamera':             this.$.eventadd.turnOnCamera();                                      break;
 					case 'turnOffLoadingEvents':     this.$.events.turnOffLoadingEvents();                                break;
 					case 'unshiftEvent':             this.$.events.unshiftEvent(event.detail.event);                      break;
 					default:console.error('There was no matching details for the event that was listened by the main container.', event);
