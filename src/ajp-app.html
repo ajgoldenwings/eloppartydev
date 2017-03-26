@@ -201,14 +201,13 @@
 
 			_fireActionApp: function(type, detail) {
 				switch(type) {
-					//case 'allowAccessToCamera':this._allowAccessToCamera();                                               break;
-					case 'hideSnack':         this._hideSnack();                                                            break;
-					case 'mainAppFire':       this._mainAppFire(detail.fire,detail.details);                                break;
-					case 'populateUserName':  this._populateUserName(detail.name);                                          break;
-					case 'progressHide':      this.$.progress.setAttribute("hidden",true);                                  break;
-					case 'progressShow':      this.$.progress.removeAttribute("hidden");                                    break;
-					case 'setPage':           this.set('route.path', '/'+detail.page);                                      break;
-					case 'showSnack':         this._throwSnack(detail.message,detail.hold,detail.onClick,detail.fireFinaly);break;
+					case 'hideSnack':          this._hideSnack();                                                            break;
+					case 'mainAppFire':        this._mainAppFire(detail.fire,detail.details);                                break;
+					case 'populateUserName':   this._populateUserName(detail.name);                                          break;
+					case 'progressHide':       this.$.progress.setAttribute("hidden",true);                                  break;
+					case 'progressShow':       this.$.progress.removeAttribute("hidden");                                    break;
+					case 'setPage':            this.set('route.path', '/'+detail.page);                                      break;
+					case 'showSnack':          this._throwSnack(detail.message,detail.hold,detail.onClick,detail.fireFinaly);break;
 					default:console.error('There was no matching function for the app event.', type);
 				}
 			},
@@ -241,34 +240,6 @@
 				this.set('route.path', '/'+page);
 				return page;// || 'welcome';
 			},
-
-			// _allowAccessToCamera: function() {
-			// 	var that = this;
-			// 	navigator.getUserMedia(
-			// 		{
-			// 			video: {
-			// 	 			mandatory: {
-			// 	 				minWidth: 400,
-			// 	 				minHeight: 400,
-			// 	 				maxWidth: 400,
-			// 	 				maxHeight: 400
-			// 	 			}
-			// 	 		}
-			// 		},
-			// 		function(localMediaStream) {
-			// 			that.mediaStream = localMediaStream;
-			// 			//that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
-			// 			that.set('appStorage.allowedCamera', true);
-			// 			var onClick = function() {
-			// 				this.fire('App', {typeFire: 'turnOffCamera'})
-			// 			};
-			// 			that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video><br><button id="snap">Snap Photo</button>', onClick: onClick, fireFinaly: "turnOnCamera"});
-			// 		}, function(err) {
-			// 			console.log('The following error occurred when trying to use getUserMedia: ' + err);
-			// 			that.fire('App', {typeFire: 'showSnack', message: 'Error accessing media device.'});
-			// 		}
-			// 	);
-			// },
 
 			_hideSnack: function() {
 				this._networkSnackbar.setAttribute("onClick","");
