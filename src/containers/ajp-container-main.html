@@ -38,7 +38,7 @@
 			<div class="flexchild"></div>
 			<div class="flex3child">
 				<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-					<ajp-event-add name="event-add" id="eventadd" app-storage="[[appStorage]]" media-stream="{{mediaStream}}"><paper-spinner active></paper-spinner></ajp-event-add>
+					<ajp-event-add name="event-add" id="eventadd" media-stream="{{mediaStream}}"><paper-spinner active></paper-spinner></ajp-event-add>
 					<ajp-action name="action"><paper-spinner active></paper-spinner></ajp-action>
 					<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"><paper-spinner active></paper-spinner></ajp-change-password-current>
 					<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"><paper-spinner active></paper-spinner></ajp-change-password-confirm>
@@ -63,11 +63,6 @@
 			is: 'ajp-container-main',
 
 			properties: {
-				appStorage: {
-					reflectToAttribute: true,
-					type: Object
-				},
-
 				baasbox: {
 					type: Object
 				},
@@ -102,6 +97,7 @@
 			},
 
 			ready: function() {
+				this.addEventListener('captureImage',             this._fireAction);
 				this.addEventListener('clearForms',               this._fireAction);
 				this.addEventListener('clearPasswordConfirm',     this._fireAction);
 				this.addEventListener('eventsPopulate',           this._fireAction);
@@ -120,6 +116,7 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
+					case 'captureImage':             this.$.eventadd.captureImage();                                      break;
 					case 'clearForms':               this.clearForms();                                                   break;
 					case 'clearPasswordConfirm':     this.clearPasswordConfirm();                                         break;
 					case 'eventsPopulate':           this.$.events.eventsPopulate(event.detail.events,event.detail.isEnd);break;

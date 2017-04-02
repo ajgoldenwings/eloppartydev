@@ -66,13 +66,13 @@
 
 		<app-localstorage-document key="appStorage" data="{{appStorage}}"></app-localstorage-document>
 
-		<ajp-media-stream id="media" name="media" media-stream="{{mediaStream}}" app-storage="[[appStorage]]"></ajp-media-stream>
+		<ajp-media-stream id="media" name="media" media-stream="{{mediaStream}}"></ajp-media-stream>
 
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" media-stream="{{mediaStream}}" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" app-storage="[[appStorage]]" user-name="[[userName]]">Loading...</ajp-container-main>
+			<ajp-container-main name="main" id="main" media-stream="{{mediaStream}}" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
 			<!-- <ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome> -->
 		</iron-pages>
@@ -141,18 +141,11 @@
 
 				appStorage: {
 					type: Object,
+					reflectToAttribute: true,
 					value: function() {
 						return {};
 					}
-				},
-
-				zeroValue: {
-					type: Object,
-					value: {
-						welcomed: false,
-						allowedCamera: false
-					}
-				},
+				}
 			},
 
 			observers: [
@@ -183,7 +176,6 @@
 				this.addEventListener('Baasbox',       this._fireAction);
 				this.addEventListener('Main',          this._fireAction);
 				this.addEventListener('Media',         this._fireAction);
-
 
 				this._populateUserName();
 			},

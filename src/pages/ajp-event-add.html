@@ -124,7 +124,7 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 
 					<div class="row input-row">
 						<div class="column">
-							<img class="img-circle" src="{{screen}}" responsive-circle></img>
+							<canvas id="canvas" width="400" height="400"></canvas>
 						</div>
 					</div>
 
@@ -149,10 +149,6 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 			is: 'ajp-event-add',
 
 			properties: {
-				appStorage: {
-					type: Object
-				},
-
 				mediaStream: {
 					type: Object,
 					reflectToAttribute: true
@@ -172,8 +168,7 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 				var callbackNeedUserPermissionSuccess = function (localMediaStream) {
 					that.mediaStream = localMediaStream;
 					that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
-					that.set('appStorage.allowedCamera', true);
-					var onClickEventCall = "this.fire('Main', {typeFire: 'turnOffCamera'}); ";
+					var onClickEventCall = "this.fire('Main', {typeFire: 'captureImage'}); this.fire('Main', {typeFire: 'turnOffCamera'}); ";
 					var fireFinaly = function () {that.fire('Main', {typeFire: 'turnOnCamera'})};
 					that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video>', onClick: onClickEventCall, fireFinaly: fireFinaly});
 				};
@@ -246,6 +241,15 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 				};
 
 				this.fire('Media', {typeFire: 'startCamera',callbackSuccess: callbackSuccess, callbackFail: callbackFail, callbackNeedUserPermission: callbackNeedUserPermission});
+			},
+
+			captureImage: function() {
+				var fire = function (that,details) {
+					var video = Polymer.dom(that._networkSnackbar).querySelector('video');
+					var context = details.getContext("2d");
+					context.drawImage(video, 0, 0, 400, 400);
+				};
+				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
 			},
 
 			turnOnCamera: function() {

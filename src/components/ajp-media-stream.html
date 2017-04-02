@@ -1,16 +1,16 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 
 <dom-module id="ajp-media-stream">
 	<template>
-
+		<iron-localstorage name="media-mtorage" value="{{mediaStorage}}" on-iron-localstorage-load-empty="initializeDefaultMediaStorage"></iron-localstorage>
 	</template>
 	<script>
 		Polymer({
 			is: "ajp-media-stream",
 
 			properties: {
-				appStorage: {
-					reflectToAttribute: true,
+				mediaStorage: {
 					type: Object
 				},
 
@@ -24,7 +24,12 @@
 				this.addEventListener('allowAccessToCamera',this._fireAction);
 				this.addEventListener('setMedia',           this._fireAction);
 				this.addEventListener('startCamera',        this._fireAction);
-				console.log('Media Ready');
+			},
+
+			initializeDefaultMediaStorage: function() {
+				this.mediaStorage = {
+					allowedCamera: false
+				}
 			},
 
 			_fireAction: function(event) {
@@ -50,6 +55,7 @@
 				 		}
 					},
 					function(localMediaStream) {
+						that.set('mediaStorage.allowedCamera', true);
 						callbackNeedUserPermissionSuccess(localMediaStream);
 					}, function(err) {
 						callbackNeedUserPermissionFail(err);
@@ -62,10 +68,9 @@
 			},
 
 			_startCamera: function(callbackSuccess,callbackFail,callbackNeedUserPermission) {
-				console.log('Starting Camera');
 				navigator.getUserMedia = this._getUserMedia();
 
-				if (this.appStorage.allowedCamera === undefined || this.appStorage.allowedCamera == false) {
+				if (this.mediaStorage.allowedCamera == false) {
 					if (navigator.getUserMedia) {
 						callbackNeedUserPermission();
 					} else {
