@@ -14,9 +14,7 @@
 
 
 <dom-module id="ajp-event-add">
-
 	<template>
-
 		<style include="ajp-form-styles ajp-button ajp-common-styles ajp-input ajp-select paper-dropdown-menu-styles">
 			[responsive-circle] {
 				border-radius: 50%;
@@ -27,22 +25,15 @@
 					border-radius: 50%;
 				}
 			}
-		</style>
 
-<style>
-.demo-frame header, .demo-frame h1, .demo-frame .demo-conversion {display: none;}
-.demo-wrapper {min-height: 500px;}
-.bsap {position: absolute;top: 0;right: 0;}
-video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
-#canvas { margin-top: 20px; border: 1px solid #ccc; display: block; }
-</style>
+			#canvas { margin-top: 20px; display: block; max-height: 100px; max-width: 100px;}
+		</style>
 
 		<form
 			id="addEventForm"
 			is="iron-form"
 			method="post"
 		>
-
 			<div class="container flex-horizontal-with-ratios">
 				<div class="flexchild"></div>
 				<div class="flex3child">
@@ -124,7 +115,7 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 
 					<div class="row input-row">
 						<div class="column">
-							<canvas id="canvas" width="400" height="400"></canvas>
+							<canvas id="canvas" width="400" height="400" on-click="_notifyToCaptureNewPhoto"></canvas>
 						</div>
 					</div>
 
@@ -137,15 +128,11 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 
 				<div class="flexchild"></div>
 			</div>
-
 		</form>
-
 	</template>
 
 	<script>
-
 		Polymer({
-
 			is: 'ajp-event-add',
 
 			properties: {
@@ -167,6 +154,7 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 				var that = this;
 				var callbackNeedUserPermissionSuccess = function (localMediaStream) {
 					that.mediaStream = localMediaStream;
+					that.fire('Main', {typeFire: 'turnOffCamera'});
 					that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
 					var onClickEventCall = "this.fire('Main', {typeFire: 'captureImage'}); this.fire('Main', {typeFire: 'turnOffCamera'}); ";
 					var fireFinaly = function () {that.fire('Main', {typeFire: 'turnOnCamera'})};
@@ -248,6 +236,7 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 					var video = Polymer.dom(that._networkSnackbar).querySelector('video');
 					var context = details.getContext("2d");
 					context.drawImage(video, 0, 0, 400, 400);
+					// console.log(context.toDataURL("image/jpeg"));
 				};
 				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
 			},
@@ -263,8 +252,14 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 			},
 
 			turnOffCamera: function() {
-				var track = stream.getTracks()[0];
-				track.stop();
+				if (typeof stream !== 'undefined') {
+					var track = stream.getTracks()[0];
+					track.stop();
+				}
+			},
+
+			_notifyToCaptureNewPhoto: function() {
+				this.fire('App', {typeFire: 'showSnack', message: 'Press \'Take Photo\' to capture a new photo.'});
 			},
 
 			_validateForm: function() {
@@ -313,9 +308,6 @@ video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
 
 				return !firstInvalid;
 			}
-
 		});
-
 	</script>
-
 </dom-module>

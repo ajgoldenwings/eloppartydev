@@ -37,3 +37,13 @@ This command serves the minified version of the app in an unbundled state, as it
 This command serves the minified version of the app generated using fragment bundling:
 
     polymer serve build/bundled
+
+# Server Setup
+
+### AWS
+
+
+### Baasbox
+
+Make sure you use a stable version. Many things may not work.
+
