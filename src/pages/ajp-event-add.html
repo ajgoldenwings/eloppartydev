@@ -26,7 +26,7 @@
 				}
 			}
 
-			#canvas { margin-top: 20px; display: block; max-height: 100px; max-width: 100px;}
+			#canvas { margin: 20px auto; max-height: 200px; max-width: 200px;}
 		</style>
 
 		<form
@@ -158,7 +158,7 @@
 					that.fire('Media', {typeFire: 'setMedia', mediaStream: localMediaStream});
 					var onClickEventCall = "this.fire('Main', {typeFire: 'captureImage'}); this.fire('Main', {typeFire: 'turnOffCamera'}); ";
 					var fireFinaly = function () {that.fire('Main', {typeFire: 'turnOnCamera'})};
-					that.fire('App', {typeFire: 'showSnack', hold: true, message: 'Accessing the camera is available and ready, however we are still in <b>development</b>.<hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video>', onClick: onClickEventCall, fireFinaly: fireFinaly});
+					that.fire('App', {typeFire: 'showSnack', hold: true, message: '<b>Tap to capture!</b><hr><video muted="" autoplay="" style="width:100%;max-width:500px"></video>', onClick: onClickEventCall, fireFinaly: fireFinaly});
 				};
 				var callbackNeedUserPermissionFail = function (err) {
 					console.log('The following error occurred when trying to use getUserMedia: ' + err);
@@ -235,8 +235,35 @@
 				var fire = function (that,details) {
 					var video = Polymer.dom(that._networkSnackbar).querySelector('video');
 					var context = details.getContext("2d");
-					context.drawImage(video, 0, 0, 400, 400);
-					// console.log(context.toDataURL("image/jpeg"));
+
+					// Credit (http://jsfiddle.net/epistemex/yqce3tuw/1/): epistemex
+					var iw = video.videoWidth,
+							ih = video.videoHeight,
+							r = Math.min(400 / iw, 400 / ih),
+							nw = iw * r,   /// new prop. width
+							nh = ih * r,   /// new prop. height
+							cx, cy, cw, ch, ar = 1;
+
+					/// decide which gap to fill
+					if (nw < 400) ar = 400 / nw;
+					if (nh < 400) ar = 400 / nh;
+					nw *= ar;
+					nh *= ar;
+
+					/// calc source rectangle
+					cw = iw / (nw / 400);
+					ch = ih / (nh / 400);
+
+					cx = (iw - cw) * 0.5;
+					cy = (ih - ch) * 0.5;
+
+					/// make sure source rectangle is valid
+					if (cx < 0) cx = 0;
+					if (cy < 0) cy = 0;
+					if (cw > iw) cw = iw;
+					if (ch > ih) ch = ih;
+
+					context.drawImage(video, cx, cy, cw, ch,  0, 0, 400, 400);
 				};
 				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
 			},
@@ -304,9 +331,25 @@
 					if (firstInvalid) {
 						this.fire('App', {typeFire: 'showSnack', message: 'Please fill out the event form.'});
 					}
+
+					if (!firstInvalid) {
+						if (this._isCanvasBlank(this.$.canvas)) {
+							firstInvalid = true;
+							this.fire('App', {typeFire: 'showSnack', message: 'Please take a photo.'});
+						}
+
+					}
 				}
 
 				return !firstInvalid;
+			},
+
+			_isCanvasBlank: function(canvas) {
+					var blank = document.createElement('canvas');
+					blank.width = canvas.width;
+					blank.height = canvas.height;
+
+					return canvas.toDataURL() == blank.toDataURL();
 			}
 		});
 	</script>
