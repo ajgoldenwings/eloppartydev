@@ -181,16 +181,16 @@
 
 
 		<paper-material class='eventItem'>
-			<iron-image preload sizing="cover" class="eventItemImage" src="[[_getImageSRC(event)]]"></iron-image>
+			<iron-image id="eventIronImage" preload sizing="cover" class="eventItemImage" src="[[_getImageSRC(event)]]"></iron-image>
 			<div class="eventItemContent">
 				<div class="eventItemTitle">[[event.title]]</div>
 				<div class="eventItemDetails flex-horizontal topMargin">
 					<div class="eventItemDetailsPromoter ">
 						<div class="eventItemAuthor">[[event._author]]</div>
 						<div class="eventItemStarPower" id="starPower">
-							<div class="score inline notCompleted">1,000</div><paper-icon-button icon="star" aria-label="Go back"></paper-icon-button>
+							<div class="score inline notCompleted"><!-- 1,000 --></div><paper-icon-button icon="star" aria-label="Go back"></paper-icon-button>
 						</div>
-						<paper-tooltip for="starPower" offset="0">Star Power</paper-tooltip>
+						<paper-tooltip for="starPower" offset="0"><!-- Star Power --></paper-tooltip>
 					</div>
 					<div class="flexchild"></div>
 					<div class="eventItemDetailsEvent">
@@ -209,7 +209,7 @@
 					<div class="flexchild"></div>
 					<div>
 						<iron-icon icon="communication:location-on"></iron-icon>
-						<span>250ft</span>
+						<!-- <span>250ft</span> -->
 					</div>
 				</div>
 			</div>
@@ -238,10 +238,11 @@
 			},
 
 			_getImageSRC: function(event) {
-				if (event.currentEventNumber)
-					return "../../data/" + event.currentEventNumber + ".jpg";
-				else
-					return "../../data/" + 0 + ".jpg";
+				return event.canvasData;
+				// if (event.currentEventNumber)
+				// 	return "../../data/" + event.currentEventNumber + ".jpg";
+				// else
+				// 	return "../../data/" + 0 + ".jpg";
 			},
 
 			_formatDateTime: function(date,minutes) {

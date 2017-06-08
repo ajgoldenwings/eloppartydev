@@ -35,22 +35,23 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
-					case 'eventAdd':           this.eventAdd(           event.detail.callbackSuccess,event.detail.callbackFail,event.detail.title,event.detail.startTime,event.detail.length);               break;
-					case 'eventsLoad':         this.eventsLoad(         event.detail.callbackSuccess,event.detail.callbackFail,event.detail.page);                                                           break;
-					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);                          break;
-					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                                                       break;
-					case 'signOff':            this.signOff(            event.detail.callbackSuccess,event.detail.callbackFail);                                                                             break;
-					case 'signOn':             this.signOn(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.name, event.detail.password);                                    break;
-					case 'signUp':             this.signUp(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.callbackFailUserExists,event.detail.name, event.detail.password);break;
+					case 'eventAdd':           this.eventAdd(           event.detail.callbackSuccess,event.detail.callbackFail,event.detail.title,event.detail.startTime,event.detail.length,event.detail.canvasData);break;
+					case 'eventsLoad':         this.eventsLoad(         event.detail.callbackSuccess,event.detail.callbackFail,event.detail.page);                                                                    break;
+					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);                                   break;
+					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                                                                break;
+					case 'signOff':            this.signOff(            event.detail.callbackSuccess,event.detail.callbackFail);                                                                                      break;
+					case 'signOn':             this.signOn(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.name, event.detail.password);                                             break;
+					case 'signUp':             this.signUp(             event.detail.callbackSuccess,event.detail.callbackFail,event.detail.callbackFailUserExists,event.detail.name, event.detail.password);         break;
 					default:console.error('There was no matching details for the event that was listened by BaasBox.', event);
 				}
 			},
 
-			eventAdd: function(callbackSuccess, callbackFail, title, startTime, length) {
+			eventAdd: function(callbackSuccess, callbackFail, title, startTime, length, canvasData) {
 				var elop_event = new Object();
 				elop_event.title = title;
 				elop_event.date = startTime;
 				elop_event.length = length;
+				elop_event.canvasData = canvasData;
 				var resultTemp;
 				BaasBox.save(elop_event, "elop_events")
 				.done(function(res) {
