@@ -3,7 +3,7 @@
 
 <dom-module id="ajp-media-stream">
 	<template>
-		<iron-localstorage name="media-mtorage" value="{{mediaStorage}}" on-iron-localstorage-load-empty="initializeDefaultMediaStorage"></iron-localstorage>
+		<iron-localstorage name="media-storage" value="{{mediaStorage}}" on-iron-localstorage-load-empty="initializeDefaultMediaStorage"></iron-localstorage>
 	</template>
 	<script>
 		Polymer({
@@ -47,10 +47,10 @@
 					{
 						video: {
 				 			mandatory: {
-				 				minWidth: 200,
-				 				minHeight: 200,
-				 				maxWidth: 200,
-				 				maxHeight: 200
+				 				minWidth: 192,
+				 				minHeight: 192,
+				 				maxWidth: 192,
+				 				maxHeight: 192
 				 			}
 				 		}
 					},

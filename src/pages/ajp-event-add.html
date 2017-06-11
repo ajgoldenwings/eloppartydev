@@ -26,7 +26,7 @@
 				}
 			}
 
-			#canvas { margin: 20px auto; max-height: 200px; max-width: 200px;}
+			#canvas { margin: 20px auto; max-height: 192px; max-width: 192px;}
 		</style>
 
 		<form
@@ -115,7 +115,7 @@
 
 					<div class="row input-row">
 						<div class="column">
-							<canvas id="canvas" width="200" height="200" on-click="_notifyToCaptureNewPhoto"></canvas>
+							<canvas id="canvas" width="192" height="192" on-click="_notifyToCaptureNewPhoto"></canvas>
 						</div>
 					</div>
 
@@ -234,7 +234,7 @@
 
 				var callbackNeedUserPermission = function () {
 					var onClickEventCall = "this.fire('Main', {typeFire: 'startCameraPermission'});";
-					that.fire('App', {typeFire: 'showSnack', message: 'Click here to allow access to your device\'s camera.', hold: false, onClick: onClickEventCall});
+					that.fire('App', {typeFire: 'showSnack', message: 'Click here to allow access to your device\'s Camera.', hold: false, onClick: onClickEventCall});
 				};
 
 				this.fire('Media', {typeFire: 'startCamera',callbackSuccess: callbackSuccess, callbackFail: callbackFail, callbackNeedUserPermission: callbackNeedUserPermission});
@@ -248,20 +248,20 @@
 					// Credit (http://jsfiddle.net/epistemex/yqce3tuw/1/): epistemex
 					var iw = video.videoWidth,
 							ih = video.videoHeight,
-							r = Math.min(200 / iw, 200 / ih),
+							r = Math.min(192 / iw, 192 / ih),
 							nw = iw * r,   /// new prop. width
 							nh = ih * r,   /// new prop. height
 							cx, cy, cw, ch, ar = 1;
 
 					/// decide which gap to fill
-					if (nw < 200) ar = 200 / nw;
-					if (nh < 200) ar = 200 / nh;
+					if (nw < 192) ar = 192 / nw;
+					if (nh < 192) ar = 192 / nh;
 					nw *= ar;
 					nh *= ar;
 
 					/// calc source rectangle
-					cw = iw / (nw / 200);
-					ch = ih / (nh / 200);
+					cw = iw / (nw / 192);
+					ch = ih / (nh / 192);
 
 					cx = (iw - cw) * 0.5;
 					cy = (ih - ch) * 0.5;
@@ -272,7 +272,7 @@
 					if (cw > iw) cw = iw;
 					if (ch > ih) ch = ih;
 
-					context.drawImage(video, cx, cy, cw, ch,  0, 0, 200, 200);
+					context.drawImage(video, cx, cy, cw, ch,  0, 0, 192, 192);
 				};
 				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
 			},
@@ -295,10 +295,10 @@
 			},
 
 			_notifyToCaptureNewPhoto: function() {
-					// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-					var canvas = this.$.canvas;
-					var canvasDataURL = canvas.toDataURL();
-console.log(this.$.canvas.toDataURL());
+				// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+				var canvas = this.$.canvas;
+				var canvasDataURL = canvas.toDataURL();
+
 				this.fire('App', {typeFire: 'showSnack', message: 'Press \'Take Photo\' to capture a new photo.'});
 			},
 

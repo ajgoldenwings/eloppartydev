@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../styles/ajp-common-styles.html">
 
 <dom-module id="ajp-action">
@@ -13,9 +14,12 @@
 				color: var(--app-primary-color);
 			}
 
-			.paper-item-link {
-				color: inherit;
-				text-decoration: none;
+			paper-item {
+				cursor: pointer;
+			}
+
+			.important {
+				background-color: lightgray;
 			}
 
 			:host([two-line]) {
@@ -25,41 +29,78 @@
 
 		<h2>Action Page</h2>
 
-		<h4 class="border-bottom">Actions</h4>
-
 		<div role="listbox">
-			<a href="/event-add">
-				<paper-item class="border-bottom">
-					<paper-item-body two-line>
-						<div>Add Event</div>
-						<div secondary>Go to and create an Event</div>
-					</paper-item-body>
-				</paper-item>
-			</a>
-			<a href="/settings">
-				<paper-item class="border-bottom">
-					<paper-item-body two-line>
-						<div>Settings</div>
-						<div secondary>Go to the Settings Page</div>
-					</paper-item-body>
-				</paper-item>
-			</a>
+			<paper-item class="border-bottom important" hidden$="[[gpsAllowed]]" on-click="_accessGPS">
+				<paper-item-body two-line>
+					<div>Allow Access to GPS</div>
+					<div secondary>Get your closest events to you and be able to Add Events</div>
+				</paper-item-body>
+				<paper-icon-button icon="communication:location-on" alt="Access your devices GPS">
+				</paper-icon-button>
+			</paper-item>
+			<paper-item class="border-bottom" disabled="[[!gpsAllowed]]" on-click="_eventAdd">
+				<paper-item-body two-line>
+					<div>Add Event</div>
+					<div secondary>Go to and create an Event</div>
+				</paper-item-body>
+			</paper-item>
+			<paper-item class="border-bottom"  on-click="_settings">
+				<paper-item-body two-line>
+					<div>Settings</div>
+					<div secondary>Go to the Settings Page</div>
+				</paper-item-body>
+			</paper-item>
 		</div>
 
 	</template>
 
 	<script>
-
 		Polymer({
-
 			is: 'ajp-action',
-
 			properties: {
+				gpsStorage: {
+					type:Object,
+					reflectToAttribute: true
+				},
 
+				gpsAllowed: {
+					type: Boolean,
+					value: false,
+					reflectToAttribute: true
+				}
+			},
+
+			observers: [
+				'_handleGPSStorageChanged(gpsStorage.gpsAllowed)'
+			],
+
+			_accessGPS: function() {
+				var that = this;
+				var callbackFail = function () {
+					that.fire('App', {typeFire: 'showSnack', message: 'We did not find a GPS on your device. Sorry.'});
+				};
+				var callbackSuccess = function () {
+					that.fire('GPS', {typeFire: 'startGPSPermissionAndSet'});
+				};
+				var callbackNeedUserPermission = function () {
+					var onClickEventCall = "this.fire('GPS', {typeFire: 'startGPSPermissionAndSet'});";
+					that.fire('App', {typeFire: 'showSnack', message: 'Click here to allow access to your device\'s GPS.', hold: false, onClick: onClickEventCall});
+				};
+
+				this.fire('GPS', {typeFire: 'startGPS',callbackSuccess: callbackSuccess, callbackFail: callbackFail, callbackNeedUserPermission: callbackNeedUserPermission});
+			},
+
+			_eventAdd: function() {
+				this.fire('App', {typeFire: 'setPage', page: 'event-add'});
+			},
+
+			_handleGPSStorageChanged: function(gpsAllowed) {
+				this.gpsAllowed = gpsAllowed;
+			},
+
+			_settings: function() {
+				this.fire('App', {typeFire: 'setPage', page: 'settings'});
 			}
-
 		});
-
 	</script>
-
 </dom-module>

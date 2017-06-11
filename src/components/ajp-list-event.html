@@ -82,7 +82,7 @@
 			}
 
 			.eventItemContent .eventItemDetailsEvent {
-				font-size: 0.68em;
+				font-size: 0.88em;
 				display: flex;
 				flex-direction: column;
 			}
@@ -176,9 +176,7 @@
 					font-size: 1.3em
 				}
 			}
-
 		</style>
-
 
 		<paper-material class='eventItem'>
 			<iron-image id="eventIronImage" preload sizing="cover" class="eventItemImage" src="[[_getImageSRC(event)]]"></iron-image>
@@ -188,7 +186,7 @@
 					<div class="eventItemDetailsPromoter ">
 						<div class="eventItemAuthor">[[event._author]]</div>
 						<div class="eventItemStarPower" id="starPower">
-							<div class="score inline notCompleted"><!-- 1,000 --></div><paper-icon-button icon="star" aria-label="Go back"></paper-icon-button>
+							<div class="score inline notCompleted"><!-- 1,000 --></div><paper-icon-button icon="star" aria-label="Star Power"></paper-icon-button>
 						</div>
 						<paper-tooltip for="starPower" offset="0"><!-- Star Power --></paper-tooltip>
 					</div>

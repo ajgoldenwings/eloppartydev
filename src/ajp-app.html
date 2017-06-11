@@ -20,6 +20,7 @@
 <link rel="import" href="ajp-baasbox.html">
 <link rel="import" href="components/ajp-toolbar.html">
 <link rel="import" href="components/ajp-media-stream.html">
+<link rel="import" href="components/ajp-gps.html">
 
 <dom-module id="ajp-app">
 	<template>
@@ -66,13 +67,15 @@
 
 		<app-localstorage-document key="appStorage" data="{{appStorage}}"></app-localstorage-document>
 
+		<ajp-gps id="gps" name="gps" gps-storage="{{gpsStorage}}"></ajp-gps>
+
 		<ajp-media-stream id="media" name="media" media-stream="{{mediaStream}}"></ajp-media-stream>
 
 		<app-location route="{{route}}"></app-location>
 		<app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
 		<iron-pages role="layout" selected="[[getLayout]]" attr-for-selected="name" selected-attribute="visible">
-			<ajp-container-main name="main" id="main" media-stream="{{mediaStream}}" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
+			<ajp-container-main name="main" id="main" media-stream="{{mediaStream}}" gps-storage="[[gpsStorage]]" page="[[page]]" baasbox="[[baasbox]]" user-defined="[[userDefined]]" user-name="[[userName]]">Loading...</ajp-container-main>
 			<ajp-container-authentication name="authentication" id="authentication" page="[[page]]">Loading...</ajp-container-authentication>
 			<!-- <ajp-container-welcome name="welcome" id="welcome">Loading...</ajp-container-welcome> -->
 		</iron-pages>
@@ -92,6 +95,11 @@
 			is: 'ajp-app',
 
 			properties: {
+				gpsStorage: {
+					type:Object,
+					reflectToAttribute: true
+				},
+
 				mediaStream: {
 					type: Object,
 					reflectToAttribute: true
@@ -174,6 +182,7 @@
 				this.addEventListener('App',           this._fireAction);
 				this.addEventListener('Authentication',this._fireAction);
 				this.addEventListener('Baasbox',       this._fireAction);
+				this.addEventListener('GPS',           this._fireAction);
 				this.addEventListener('Main',          this._fireAction);
 				this.addEventListener('Media',         this._fireAction);
 
@@ -184,6 +193,7 @@
 				switch(event.type) {
 					case 'App':           this._fireActionApp(       event.detail.typeFire, event.detail);break;
 					case 'Authentication':this.$.authentication.fire(event.detail.typeFire, event.detail);break;
+					case 'GPS':           this.$.gps.fire(           event.detail.typeFire, event.detail);break;
 					case 'Baasbox':       this.$.baasbox.fire(       event.detail.typeFire, event.detail);break;
 					case 'Main':          this.$.main.fire(          event.detail.typeFire, event.detail);break;
 					case 'Media':         this.$.media.fire(         event.detail.typeFire, event.detail);break;

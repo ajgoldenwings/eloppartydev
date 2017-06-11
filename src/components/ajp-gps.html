@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+
+<dom-module id="ajp-gps">
+	<template>
+		<iron-localstorage name="gpsStorage" value="{{gpsStorage}}" on-iron-localstorage-load-empty="initializeDefaultGPSStorage"></iron-localstorage>
+	</template>
+	<script>
+		Polymer({
+			is: "ajp-gps",
+
+			properties: {
+				gpsStorage: {
+					type: Object,
+					notify: true
+				}
+			},
+
+			ready: function() {
+				this.addEventListener('startGPSPermissionAndSet',this._fireAction);
+				this.addEventListener('startGPS',                this._fireAction);
+			},
+
+			initializeDefaultGPSStorage: function() {
+				this.gpsStorage = {
+					gpsAllowed: false,
+					x: null,
+					y: null
+				}
+			},
+
+			_fireAction: function(event) {
+				switch(event.type) {
+					case 'startGPSPermissionAndSet':this._startGPSPermissionAndSet(event.detail.callbackNeedUserPermissionSuccess,event.detail.callbackNeedUserPermissionFail);break;
+					case 'startGPS':                this._startGPS(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.callbackNeedUserPermission);            break;
+					default:console.error('There was no matching details for the event that was listened by the media stream component.', event);
+				}
+			},
+
+			_startGPSPermissionAndSet: function(callbackNeedUserPermissionSuccess, callbackNeedUserPermissionFail) {
+				var that = this;
+				var setPosition = function (position) {
+					that.set("gpsStorage.gpsAllowed", true);
+					that.set("gpsStorage.x", position.coords.latitude);
+					that.set("gpsStorage.y", position.coords.longitude);
+				};
+				var showError = function (error) {
+					var errorString = "";
+					switch(error.code) {
+						case error.PERMISSION_DENIED:
+							errorString = "The request for Geolocation was denied."
+						break;
+						case error.POSITION_UNAVAILABLE:
+							errorString = "Location information is unavailable."
+						break;
+						case error.TIMEOUT:
+							errorString = "The request to get location timed out."
+						break;
+						case error.UNKNOWN_ERROR:
+							errorString = "An unknown error occurred."
+						break;
+					}
+					that.fire('App', {typeFire: 'showSnack', message: 'We did not find a GPS on your device. Sorry.'});
+				};
+
+        navigator.geolocation.getCurrentPosition(setPosition, showError);
+			},
+
+			_startGPS: function(callbackSuccess,callbackFail,callbackNeedUserPermission) {
+				if (navigator.geolocation) {
+					if (this.gpsStorage["gpsAllowed"] == false) {
+						if (navigator.getUserMedia) {
+							callbackNeedUserPermission();
+						} else {
+							callbackFail();
+						}
+					} else {
+						callbackSuccess();
+					}
+				}
+				else {
+					console.log('Geolocation is not supported for this Browser/OS.');
+				}
+				this.set('gpsStorage.gpsAllowed', false);
+			}
+		});
+	</script>
+</dom-module>
