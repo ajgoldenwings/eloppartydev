@@ -46,25 +46,63 @@
 				}
 			},
 
+			dataURItoBlob: function(dataURI)
+			{
+				var byteString = atob(dataURI.split(',')[1]);
+				var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+				var ab = new ArrayBuffer(byteString.length);
+				var ia = new Uint8Array(ab);
+
+				for (var i = 0; i < byteString.length; i++)
+				{
+					ia[i] = byteString.charCodeAt(i);
+				}
+
+				var bb = new Blob([ab], { "type": mimeString });
+
+				return bb;
+			},
+
 			eventAdd: function(callbackSuccess, callbackFail, title, startTime, length, canvasData) {
 				var elop_event = new Object();
 				elop_event.title = title;
 				elop_event.date = startTime;
 				elop_event.length = length;
-				elop_event.canvasData = canvasData;
+
+				var dataUrl = canvasData.toDataURL("image/jpeg");
+				var blob = this.dataURItoBlob(dataUrl);
+				var formData = new FormData();
+				formData.append("file", blob);
+
 				var resultTemp;
-				BaasBox.save(elop_event, "elop_events")
+				var resultTempImage;
+				BaasBox.uploadFile(formData)
 				.done(function(res) {
-					resultTemp = res;
-					BaasBox.grantRoleAccessToObject("elop_events", res.id, BaasBox.READ_PERMISSION, BaasBox.REGISTERED_ROLE)
-					.done(function(res) { callbackSuccess(resultTemp)})
-					.fail(function(err) { callbackFail()})})
-				.fail(function(err) { callbackFail()});
+
+					resultTempImage = JSON.parse(res);
+					elop_event.imageFileId = resultTempImage['data'].id;
+
+					BaasBox.grantRoleAccessToFile(resultTempImage['data'].id, BaasBox.READ_PERMISSION, BaasBox.REGISTERED_ROLE)
+					.done(function(res) { console.log("photo shared")})
+					.fail(function(error) {console.log("error ", error)});
+
+					BaasBox.save(elop_event, "elop_events")
+					.done(function(res) {
+						resultTemp = res;
+						BaasBox.grantRoleAccessToObject("elop_events", res.id, BaasBox.READ_PERMISSION, BaasBox.REGISTERED_ROLE)
+						.done(function(res) { callbackSuccess(resultTemp)})
+						.fail(function(err) { callbackFail(); console.log(err)})})
+					.fail(function(err) { callbackFail(); console.log(err)});
+
+				})
+				.fail(function(error) {callbackFail(); console.log("error ", error)});
 			},
 
 			eventsLoad: function(callbackSuccess, callbackFail, page) {
-				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: 5, orderBy: "_creation_date DESC"})
-				.done(function(res) { callbackSuccess(res,res.length==0)})
+				var recordsPerPage = 5;
+
+				BaasBox.loadCollectionWithParams('elop_events', {page: page, recordsPerPage: recordsPerPage, orderBy: "_creation_date DESC"})
+				.done(function(res) { callbackSuccess(res,res.length<recordsPerPage)})
 				.fail(function(err) { callbackFail()});
 			},
 

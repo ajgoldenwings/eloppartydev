@@ -179,7 +179,7 @@
 		</style>
 
 		<paper-material class='eventItem'>
-			<iron-image id="eventIronImage" preload sizing="cover" class="eventItemImage" src="[[_getImageSRC(event)]]"></iron-image>
+			<iron-image id="eventIronImage" preload sizing="cover" class="eventItemImage" src="[[_getImage(event.imageFileId)]]"></iron-image>
 			<div class="eventItemContent">
 				<div class="eventItemTitle">[[event.title]]</div>
 				<div class="eventItemDetails flex-horizontal topMargin">
@@ -225,22 +225,15 @@
 				event: {
 					type: Object,
 					value: function() {return {title: 'Event'}; }
-				},
-
-				image: {
-					type: String,
 				}
 			},
 
-			ready: function() {
-			},
+			observers: [
+				'_getImage(event.imageFileId)'
+			],
 
-			_getImageSRC: function(event) {
-				return event.canvasData;
-				// if (event.currentEventNumber)
-				// 	return "../../data/" + event.currentEventNumber + ".jpg";
-				// else
-				// 	return "../../data/" + 0 + ".jpg";
+			_getImage: function(imageFileId) {
+				return "https://baasbox.elopparty.com/file/"+imageFileId+"?X-BB-SESSION="+BaasBox.getCurrentUser().token;
 			},
 
 			_formatDateTime: function(date,minutes) {

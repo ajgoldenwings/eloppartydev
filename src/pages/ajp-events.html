@@ -62,27 +62,17 @@
 					type: Boolean,
 					value: true
 				},
-
-				currentEventNumber: {
-					type: Number,
-					value: 0
-				}
 			},
+
 
 			eventsPopulate: function(events,isEnd) {
 				var eventsLength = events.length;
-
-				for (var i = 0; i < eventsLength; i++) {
-					events[i].currentEventNumber = this.currentEventNumber++;
-					if (this.currentEventNumber == 22)
-						this.currentEventNumber = 0;
-					this.pushEvent(events[i]);
-				}
-
 				this.turnOffLoadingEvents();
-				if (!isEnd) {
+				for (var i = 0; i < eventsLength; i++)
+					this.pushEvent(events[i]);
+
+				if (!isEnd)
 					this.$.scrollTheshold.clearTriggers();
-				}
 			},
 
 			pushEvent: function(event) {

@@ -26,7 +26,7 @@
 				}
 			}
 
-			#canvas { margin: 20px auto; max-height: 192px; max-width: 192px;}
+			#canvas { margin: 20px auto; max-height: 400px; max-width: 400px;}
 		</style>
 
 		<form
@@ -115,7 +115,7 @@
 
 					<div class="row input-row">
 						<div class="column">
-							<canvas id="canvas" width="192" height="192" on-click="_notifyToCaptureNewPhoto"></canvas>
+							<canvas id="canvas" width="400" height="400" on-click="_notifyToCaptureNewPhoto"></canvas>
 						</div>
 					</div>
 
@@ -218,7 +218,7 @@
 						startTime: this.$.startTime.value,
 						length: this.$.eventLength.value,
 						// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-						canvasData:this.$.canvas.toDataURL()
+						canvasData:this.$.canvas
 					});
 				}
 			},
@@ -248,20 +248,20 @@
 					// Credit (http://jsfiddle.net/epistemex/yqce3tuw/1/): epistemex
 					var iw = video.videoWidth,
 							ih = video.videoHeight,
-							r = Math.min(192 / iw, 192 / ih),
+							r = Math.min(400 / iw, 400 / ih),
 							nw = iw * r,   /// new prop. width
 							nh = ih * r,   /// new prop. height
 							cx, cy, cw, ch, ar = 1;
 
 					/// decide which gap to fill
-					if (nw < 192) ar = 192 / nw;
-					if (nh < 192) ar = 192 / nh;
+					if (nw < 400) ar = 400 / nw;
+					if (nh < 400) ar = 400 / nh;
 					nw *= ar;
 					nh *= ar;
 
 					/// calc source rectangle
-					cw = iw / (nw / 192);
-					ch = ih / (nh / 192);
+					cw = iw / (nw / 400);
+					ch = ih / (nh / 400);
 
 					cx = (iw - cw) * 0.5;
 					cy = (ih - ch) * 0.5;
@@ -272,7 +272,7 @@
 					if (cw > iw) cw = iw;
 					if (ch > ih) ch = ih;
 
-					context.drawImage(video, cx, cy, cw, ch,  0, 0, 192, 192);
+					context.drawImage(video, cx, cy, cw, ch,  0, 0, 400, 400);
 				};
 				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
 			},
