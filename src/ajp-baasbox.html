@@ -35,7 +35,7 @@
 
 			_fireAction: function(event) {
 				switch(event.type) {
-					case 'eventAdd':           this.eventAdd(           event.detail.callbackSuccess,event.detail.callbackFail,event.detail.title,event.detail.startTime,event.detail.length,event.detail.canvasData);break;
+					case 'eventAdd':           this.eventAdd(           event.detail.callbackSuccess,event.detail.callbackFail,event.detail.title,event.detail.startTime,event.detail.latitude,event.detail.length,event.detail.longitude,event.detail.canvasData);break;
 					case 'eventsLoad':         this.eventsLoad(         event.detail.callbackSuccess,event.detail.callbackFail,event.detail.page);                                                                    break;
 					case 'passwordChange':     this.passwordChange(     event.detail.callbackSuccess,event.detail.callbackFail,event.detail.passwordCurrent,event.detail.password);                                   break;
 					case 'passwordTestCurrent':this.currentPasswordTest(event.detail.callbackSuccess,event.detail.callbackFail,event.detail.password);                                                                break;
@@ -63,11 +63,13 @@
 				return bb;
 			},
 
-			eventAdd: function(callbackSuccess, callbackFail, title, startTime, length, canvasData) {
+			eventAdd: function(callbackSuccess, callbackFail, title, startTime, latitude, length, longitude, canvasData) {
 				var elop_event = new Object();
 				elop_event.title = title;
 				elop_event.date = startTime;
+				elop_event.latitude = latitude;
 				elop_event.length = length;
+				elop_event.longitude = longitude;
 
 				var dataUrl = canvasData.toDataURL("image/jpeg");
 				var blob = this.dataURItoBlob(dataUrl);
@@ -83,7 +85,7 @@
 					elop_event.imageFileId = resultTempImage['data'].id;
 
 					BaasBox.grantRoleAccessToFile(resultTempImage['data'].id, BaasBox.READ_PERMISSION, BaasBox.REGISTERED_ROLE)
-					.done(function(res) { console.log("photo shared")})
+					.done(function(res) {})
 					.fail(function(error) {console.log("error ", error)});
 
 					BaasBox.save(elop_event, "elop_events")

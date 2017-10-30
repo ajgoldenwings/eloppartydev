@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
@@ -26,7 +27,11 @@
 				}
 			}
 
-			#canvas { margin: 20px auto; max-height: 400px; max-width: 400px;}
+			.canvas { margin: 0 auto; max-height: 400px; max-width: 400px;}
+
+			ajp-input, ajp-select {
+				margin: 0 0 20px 0;
+			}
 		</style>
 
 		<form
@@ -38,6 +43,12 @@
 				<div class="flexchild"></div>
 				<div class="flex3child">
 					<h2>Add Event</h2>
+
+					<div class="row input-row">
+						<div class="column">
+							<br>
+						</div>
+					</div>
 
 					<div class="row input-row">
 						<div class="column">
@@ -101,21 +112,67 @@
 
 					<div class="row input-row">
 						<div class="column">
-							<ajp-button responsive responsive-1 on-click="_startCamera">
-								<a><paper-icon-button icon="camera-enhance" aria-label="Take Pictuer"></paper-icon-button>Take Photo</a>
+							<label id="eventLatitudeLabel">Latitude</label>
+							<ajp-input on-click="_refreshGPS">
+								<input type="latitude" id="eventLatitude" name="eventLatitude"
+										placeholder="Event Latitude" required
+										aria-labelledby="eventLatitudeLabel" value=[[gpsStorage.x]] readonly>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-input>
+						</div>
+						<div class="column">
+							<label id="eventLongitudeLabel">Longitude</label>
+							<ajp-input on-click="_refreshGPS">
+								<input type="longitude" id="eventLongitude" name="eventLongitude"
+										placeholder="Event Longitude" required
+										aria-labelledby="eventLongitudeLabel" value=[[gpsStorage.y]] readonly>
+								<ajp-md-decorator aria-hidden="true">
+									<ajp-underline></ajp-underline>
+								</ajp-md-decorator>
+							</ajp-input>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<canvas id="canvasThumb" class="canvas" width="150" height="150" on-click="_notifyToCaptureNewPhoto"></canvas>
+							<canvas id="canvas" class="canvas" width="400" height="400" style="display:none" on-click="_notifyToCaptureNewPhoto"></canvas>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<br>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-button responsive responsive-1 responsive-left on-click="_refreshGPS">
+								<a><paper-icon-button icon="maps:my-location" aria-label="Refresh"></paper-icon-button>Refresh GPS</a>
 							</ajp-button>
 						</div>
 
 						<div class="column">
-							<ajp-button responsive on-click="_add">
-								<a><paper-icon-button icon="add-circle-outline" aria-label="Add Event"></paper-icon-button>Add Event</a>
+							<ajp-button responsive responsive-1 responsive-right on-click="_startCamera">
+								<a><paper-icon-button icon="camera-enhance" aria-label="Take Pictuer"></paper-icon-button>Take Photo</a>
 							</ajp-button>
 						</div>
 					</div>
 
 					<div class="row input-row">
 						<div class="column">
-							<canvas id="canvas" width="400" height="400" on-click="_notifyToCaptureNewPhoto"></canvas>
+							<br>
+						</div>
+					</div>
+
+					<div class="row input-row">
+						<div class="column">
+							<ajp-button responsive on-click="_add">
+								<a><paper-icon-button icon="add-circle-outline" aria-label="Add Event"></paper-icon-button>Add Event</a>
+							</ajp-button>
 						</div>
 					</div>
 
@@ -136,6 +193,11 @@
 			is: 'ajp-event-add',
 
 			properties: {
+				gpsStorage: {
+					type:Object,
+					reflectToAttribute: true
+				},
+
 				mediaStream: {
 					type: Object,
 					reflectToAttribute: true
@@ -144,6 +206,9 @@
 
 			clearForm: function() {
 				this.$.eventTitle.value = '';
+				this.$.eventLength.value = '';
+				this.$.startTime.value = '';
+				this._clearCanvas();
 			},
 
 			ready: function() {
@@ -205,6 +270,7 @@
 
 					var callbackSuccess = function (event) {
 						that.fire('App', {typeFire: 'showSnack', message: 'Your event was added.'});
+						that.fire('Main', {typeFire: 'clearForms'});
 						that.fire('Main', {typeFire: 'unshiftEvent', event: event});
 						that.fire('App', {typeFire: 'progressHide'});
 						that.fire('App', {typeFire: 'setPage', page: ''});
@@ -216,11 +282,17 @@
 						callbackFail:callbackFail,
 						title: this.$.eventTitle.value,
 						startTime: this.$.startTime.value,
+						latitude: this.$.eventLatitude.value,
 						length: this.$.eventLength.value,
+						longitude: this.$.eventLongitude.value,
 						// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
 						canvasData:this.$.canvas
 					});
 				}
+			},
+
+			_refreshGPS: function() {
+				this.fire('App', {typeFire: 'showSnack', message: 'Refreshing GPS.'});
 			},
 
 			_startCamera: function() {
@@ -243,17 +315,18 @@
 			captureImage: function() {
 				var fire = function (that,details) {
 					var video = Polymer.dom(that._networkSnackbar).querySelector('video');
-					var context = details.getContext("2d");
+					var context = details.canvas.getContext("2d");
+					var contextThumb = details.canvasThumb.getContext("2d");
 
 					// Credit (http://jsfiddle.net/epistemex/yqce3tuw/1/): epistemex
 					var iw = video.videoWidth,
-							ih = video.videoHeight,
-							r = Math.min(400 / iw, 400 / ih),
-							nw = iw * r,   /// new prop. width
-							nh = ih * r,   /// new prop. height
-							cx, cy, cw, ch, ar = 1;
+						ih = video.videoHeight,
+						r = Math.min(400 / iw, 400 / ih),
+						nw = iw * r,   /// new prop. width
+						nh = ih * r,   /// new prop. height
+						cx, cy, cw, ch, ar = 1;
 
-					/// decide which gap to fill
+					// decide which gap to fill
 					if (nw < 400) ar = 400 / nw;
 					if (nh < 400) ar = 400 / nh;
 					nw *= ar;
@@ -273,8 +346,40 @@
 					if (ch > ih) ch = ih;
 
 					context.drawImage(video, cx, cy, cw, ch,  0, 0, 400, 400);
+
+					// Do Thumb
+					iw = video.videoWidth,
+						ih = video.videoHeight,
+						r = Math.min(150 / iw, 150 / ih),
+						nw = iw * r,   /// new prop. width
+						nh = ih * r,   /// new prop. height
+						cx, cy, cw, ch, ar = 1;
+
+					// decide which gap to fill
+					if (nw < 150) ar = 150 / nw;
+					if (nh < 150) ar = 150 / nh;
+					nw *= ar;
+					nh *= ar;
+
+					/// calc source rectangle
+					cw = iw / (nw / 150);
+					ch = ih / (nh / 150);
+
+					cx = (iw - cw) * 0.5;
+					cy = (ih - ch) * 0.5;
+
+					/// make sure source rectangle is valid
+					if (cx < 0) cx = 0;
+					if (cy < 0) cy = 0;
+					if (cw > iw) cw = iw;
+					if (ch > ih) ch = ih;
+
+					contextThumb.drawImage(video, cx, cy, cw, ch,  0, 0, 150, 150);
 				};
-				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: this.$.canvas});
+				var details = {};
+				details.canvas = this.$.canvas;
+				details.canvasThumb = this.$.canvasThumb;
+				this.fire('App', {typeFire: 'mainAppFire', fire: fire, details: details});
 			},
 
 			turnOnCamera: function() {
@@ -295,11 +400,20 @@
 			},
 
 			_notifyToCaptureNewPhoto: function() {
-				// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-				var canvas = this.$.canvas;
-				var canvasDataURL = canvas.toDataURL();
+				if (!this._isCanvasBlank(this.$.canvas)) {
+					this.fire('App', {typeFire: 'showSnack', message: 'Press \'Take Photo\' to capture a new photo.'});
+				}
 
-				this.fire('App', {typeFire: 'showSnack', message: 'Press \'Take Photo\' to capture a new photo.'});
+				this._clearCanvas();
+			},
+
+			_clearCanvas: function() {
+				// https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+				var ctx = this.$.canvas.getContext("2d");
+				ctx.clearRect(0, 0, 400, 400);
+
+				ctx = this.$.canvasThumb.getContext("2d");
+				ctx.clearRect(0, 0, 150, 150);
 			},
 
 			_validateForm: function() {

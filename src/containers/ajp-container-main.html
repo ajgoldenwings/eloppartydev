@@ -38,7 +38,7 @@
 			<div class="flexchild"></div>
 			<div class="flex3child">
 				<iron-pages role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-					<ajp-event-add name="event-add" id="eventadd" media-stream="{{mediaStream}}"><paper-spinner active></paper-spinner></ajp-event-add>
+					<ajp-event-add name="event-add" id="eventadd" media-stream="{{mediaStream}}" gps-storage="[[gpsStorage]]"><paper-spinner active></paper-spinner></ajp-event-add>
 					<ajp-action name="action" gps-storage="[[gpsStorage]]"><paper-spinner active></paper-spinner></ajp-action>
 					<ajp-change-password-current name="change-password-current" id="changepasswordcurrent"><paper-spinner active></paper-spinner></ajp-change-password-current>
 					<ajp-change-password-confirm name="change-password-confirm" id="changepasswordconfirm"><paper-spinner active></paper-spinner></ajp-change-password-confirm>
@@ -149,6 +149,10 @@
 				if (this.$.changepasswordnew.createdCallback !== undefined) {
 					this.$.changepasswordnew.clearForm();
 				}
+				if (this.$.eventadd.createdCallback !== undefined) {
+					this.$.eventadd.clearForm();
+				}
+
 				this.tempPasswordCurrent = '';
 				this.tempPasswordNew = '';
 			},

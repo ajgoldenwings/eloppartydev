@@ -37,12 +37,17 @@
 				}
 			},
 
+			setPosition: function() {
+				that.set("gpsStorage.x", position.coords.latitude);
+				that.set("gpsStorage.y", position.coords.longitude);
+				that.set("gpsStorage.y", 0);
+			},
+
 			_startGPSPermissionAndSet: function(callbackNeedUserPermissionSuccess, callbackNeedUserPermissionFail) {
 				var that = this;
 				var setPosition = function (position) {
 					that.set("gpsStorage.gpsAllowed", true);
-					that.set("gpsStorage.x", position.coords.latitude);
-					that.set("gpsStorage.y", position.coords.longitude);
+					that.setPosition();
 				};
 				var showError = function (error) {
 					var errorString = "";

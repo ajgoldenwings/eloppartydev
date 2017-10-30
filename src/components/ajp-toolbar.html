@@ -44,7 +44,8 @@
 			}
 
 			.back-btn {
-				display: none;
+				/*display: none;*/
+				visibility: hidden;
 			}
 
 			:host([page=event-add]) .back-btn,
@@ -54,17 +55,33 @@
 			:host([page=change-password-new]) .back-btn,
 			:host([page=licenses]) .back-btn,
 			:host([page=terms]) .back-btn {
-				display: flex;
+				visibility: visible;
 			}
 
-			:host([page=event-add]) .logo,
+			:host([page=event-add]) .more-link,
+			:host([page=settings]) .more-link,
+			:host([page=change-password-confirm]) .more-link,
+			:host([page=change-password-current]) .more-link,
+			:host([page=change-password-new]) .more-link,
+			:host([page=licenses]) .more-link,
+			:host([page=terms]) .more-link{
+				/*display: none;*/
+				visibility: hidden;
+			}
+
+			/*:host([page=event-add]) .logo,
 			:host([page=settings]) .logo,
 			:host([page=change-password-confirm]) .logo,
 			:host([page=change-password-current]) .logo,
 			:host([page=change-password-new]) .logo,
 			:host([page=licenses]) .logo,
 			:host([page=terms]) .logo {
-				padding-right: 40px;
+				margin-right: 40px;
+				margin-left: 40px;
+			}*/
+
+			iron-pages#logo {
+				margin: 0 40px;
 			}
 		</style>
 
@@ -72,13 +89,18 @@
 			<app-toolbar>
 				<div class="left-bar-item">
 					<a id="back" class="back-btn" href="/action" tabindex="-1">
-						<paper-icon-button icon="arrow-back" aria-label="Go back"></paper-icon-button>
+						<paper-icon-button icon="arrow-back" aria-label="Go back" on-click="_clearForms"></paper-icon-button>
 					</a>
 				</div>
 
 				<iron-pages id="logo" role="titleLink" selected="[[title]]" attr-for-selected="name" selected-attribute="visible" selected="home" fallbackSelection="home" title>
 					<div class="logo action" name="action"><a href="/" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
 					<div class="logo home" name="home"><a href="/action" aria-label="Elop Party" on-click="_clearForms">Elop Party</a></div>
+				</iron-pages>
+
+				<iron-pages id="more" role="moreLink" selected="[[title]]" attr-for-selected="name" selected-attribute="visible" selected="home" fallbackSelection="home">
+					<paper-icon-button class="more-link" icon="more-vert" aria-label="Switch" name="action" on-click="_goHome"></paper-icon-button>
+					<paper-icon-button class="more-link" icon="more-vert" aria-label="Switch" name="home" on-click="_goAction"></paper-icon-button>
 				</iron-pages>
 			</app-toolbar>
 		</app-header>
@@ -113,6 +135,16 @@
 			_clearForms: function(e) {
 				this.fire('Main', {typeFire: 'clearForms'});
 				this.fire('Main', {typeFire: 'clearPasswordConfirm'});
+			},
+
+			_goAction: function() {
+				this.fire('App', {typeFire: 'setPage', page: 'action'});
+				this._clearForms();
+			},
+
+			_goHome: function() {
+				this.fire('App', {typeFire: 'setPage', page: ''});
+				this._clearForms();
 			},
 
 			_pageChanged: function(page, oldPage) {
